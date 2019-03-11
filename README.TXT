@@ -1,3 +1,17 @@
+A GPS/GNSS MULTIPATH SIMULATOR IN MATLAB/OCTAVE
+
+Nievinski, F.G. and Larson, K.M. (2014)
+   "Forward modeling of GPS multipath for near-
+   surface reflectometry and positioning 
+   applications", GPS Solut., 18(2):309-322.
+   <http://doi.org/10.1007/s10291-013-0331-y>
+
+Nievinski, F.G. and Larson, K.M. (2014)
+   "An open source GPS multipath simulator 
+   in Matlab/Octave", GPS Solut., 18(3):473-481.
+   <http://doi.org/10.1007/s10291-014-0370-z>
+
+
 1) Installation
 
     1.A) In Matlab, drag the file "init.m" 
@@ -29,18 +43,7 @@ entering the following command:
 
 3) Usage examples: available in sub-directory 
 "script", which contains driver scripts named 
-after each figure in the following articles:
-
-(A) Nievinski, F.G. and Larson, K.M., 
-    "Forward modeling of GPS multipath for near-
-    surface reflectometry and positioning 
-    applications", GPS Solut., 18(2):309-322, 
-    2013, doi:10.1007/s10291-013-0331-y
-
-(B) Nievinski, F.G. and Larson, K.M., 
-    "An open source GPS multipath simulator 
-     in Matlab/Octave", GPS Solut., 18(3):473-481, 
-     2014, doi:10.1007/s10291-014-0370-z
+after each figure in the articles above.
 
 3.1) The original figure images are saved in 
 sub-directory "image"; please compare to 
