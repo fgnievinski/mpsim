@@ -1,0 +1,962 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Introduction to Functional Programming with Anonymous Functions</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-07-18"><meta name="DC.source" content="functional_programming_examples.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Introduction to Functional Programming with Anonymous Functions</h1><!--introduction--><p>The following document was built from posts written for the blog "Loren on the Art of MATLAB". The ideas presented below in anonymous functions have been written as <tt>.m</tt> files so that they might be placed on the MATLAB path. The <tt>.m</tt> versions are the same as below or slightly expanded where appropriate.</p><p>The best way to view this document is to open it in the MATLAB editor and click "Publish" or enter the following at the command line:</p><pre>  open(publish('functional_programming_examples.m'))</pre><p>Tucker McClure</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">The Goal</a></li><li><a href="#3">Minimum and Maximum Example</a></li><li><a href="#8">Map</a></li><li><a href="#14">Inline Conditionals</a></li><li><a href="#21">Anonymous Function Recursion</a></li><li><a href="#30">Helpers</a></li><li><a href="#36">Executing Multiple Statements</a></li><li><a href="#41">Loops</a></li><li><a href="#42">Loops via Recursion</a></li><li><a href="#46">A Better Loop</a></li><li><a href="#51">Summary</a></li><li><a href="#53">Addendum</a></li></ul></div><h2>The Goal<a name="1"></a></h2><p>I use a lot of anonymous functions. They're nice and compact and almost invisible in their simplicity. Plus, if I can write an anonymous function to do something, I don't need to write a <tt>.m</tt> file, and that can save me from file clutter on larger projects and from having to send someone a dozen files instead of sending one clean script. However, it seems at first glance like anonymous functions must necessarily be simple. No <tt>if... else</tt>, <tt>while</tt>, <tt>for</tt>, or any other keywords can be used. So how could we possibly write sophisticated programs in anonymous functions? We'll see, and it will involve some ideas from functional programming.</p><p>The goal of this introduction is to demonstrate how a few of these techniques can change the way we work in MATLAB, allowing greater brevity and simultaneously increasing functionality. There are three parts. In the first part, we'll present creating functions of functions and treating functions as variables (in MATLAB, that means function handles), and from there, we'll move on to implementing conditional statements (like <tt>if... else</tt>) in anonymous functions. In the next part, we'll add recursion and executing multiple statements inside an anonymous function. In the final part, we'll develope a loop function. But first, if "function handle" or "anonymous function" is new to you, go check out Loren&#8217;s great introductions to those ideas on her blog, Loren on the Art of MATLAB.</p><p><a href="http://blogs.mathworks.com/loren/">http://blogs.mathworks.com/loren/</a></p><p><h1><center>Part 1</center></h1></p><h2>Minimum and Maximum Example<a name="3"></a></h2><p>Let's say we want to write a function to find the minimum and maximum of a set of numbers and store the results in an array. Here's a first pass:</p><pre class="codeinput">min_and_max = @(x) [min(x), max(x)];
+min_and_max([3 4 1 6 2])
+</pre><pre class="codeoutput">ans =
+     1     6
+</pre><p>Our <tt>min_and_max</tt> function takes in an array that we'll call <tt>x</tt>, finds the minimum and maximum, and stores the two results in an output array. Clear? Good. But now let's make it more difficult. The <tt>min</tt> and <tt>max</tt> functions both return <i>two</i> outputs if desired (both the minimum or maximum <i>and</i> the index at which they occur in the input array). Our simple <tt>min_and_max</tt> function can't get those secondary outputs! How can we access them? Consider this odd-looking line.</p><pre class="codeinput">[extrema, indices] = cellfun(@(f) f([3 4 1 6 2]), {@min, @max})
+</pre><pre class="codeoutput">extrema =
+     1     6
+indices =
+     3     4
+</pre><p>Well, that clearly worked. The minimum, 1, occurs at index 3. The maximum, 6, occurs at index 4, but what is this line actually doing? First, recall how <tt>cellfun</tt> behaves. The first argument is a <i>function handle</i>. The second argument is a cell array of whatever. Each element of the cell array is given as an argument to the provided function handle. Most of the time, that cell array is full of data, and each piece of data is passed to the function. However, we could just as easily put function handles in the cell array. Then the first function (<tt>@(f) f(...)</tt>) <i>acts on all the other functions</i>. So, first <tt>@min</tt> is passed in for <tt>f</tt> and the outputs from <tt>min([3 4 1 6 2])</tt> are stored. Then, <tt>@max</tt> is passed in for <tt>f</tt>, and its outputs are stored.</p><p>Ok, now that we're working with functions of functions, let's remove that hard-coded <tt>[3 4 1 6 2]</tt> and write a new <tt>min_and_max</tt> function by simply adding a <tt>@(x)</tt> out front and changing <tt>[3 4 1 6 2]</tt> to <tt>x</tt>.</p><pre class="codeinput">min_and_max = @(x) cellfun(@(f) f(x), {@min, @max});
+</pre><p>We can now use <tt>min_and_max</tt> for just the extrema, like before, but we can also get the indices too.</p><pre class="codeinput">y = randi(10, 1, 10)
+just_values        = min_and_max(y)
+[~, just_indices]  = min_and_max(y)
+[extrema, indices] = min_and_max(y)
+</pre><pre class="codeoutput">y =
+     9    10     2    10     7     1     3     6    10    10
+just_values =
+     1    10
+just_indices =
+     6     2
+extrema =
+     1    10
+indices =
+     6     2
+</pre><p>That might have looked a little funny, but it's pretty easy to think about, right? Now let's make it look a little nicer too.</p><h2>Map<a name="8"></a></h2><p>Above, we're mapping each function to our input <tt>x</tt>. More generally, we might write a "map" function to map a series of functions to the input values. We'll make <tt>val</tt> a cell array so we can also send multiple inputs to multiple functions all at once. This is like what we had before, but re-arranged a bit.</p><pre class="codeinput">map = @(val, fcns) cellfun(@(f) f(val{:}), fcns);
+</pre><p>Look how simple this makes <tt>min_and_max</tt> (below), while still accessing both outputs. Not only is it shorter to write than any other versions so far, it's easier to read, with hardly anything but a single occurrence of each variable or function name. "Map <tt>x</tt> to the <tt>min</tt> and <tt>max</tt> functions". No problem.</p><pre class="codeinput">x = [3 4 1 6 2];
+[extrema, indices] = map({x}, {@min, @max})
+</pre><pre class="codeoutput">extrema =
+     1     6
+indices =
+     3     4
+</pre><p>Let's try multiple inputs:</p><pre class="codeinput">map({1, 2}, {@plus, @minus, @times})
+</pre><pre class="codeoutput">ans =
+     3    -1     2
+</pre><p>What if outputs are different sizes? We'll write <tt>mapc</tt> (as in MAP with Cell array outputs) to handle this; all it needs is an extra argument to <tt>cellfun</tt> to say that our output isn't uniform in size.</p><pre class="codeinput">mapc = @(val, fcns) cellfun(@(f) f(val{:}), fcns, <span class="string">'UniformOutput'</span>, false);
+</pre><p>Send <tt>pi</tt> to multiple functions that return differently-sized arrays. The first output is a scalar, the second is a scalar, and the third is a string.</p><pre class="codeinput">mapc({pi}, {@(x) 2 * x, <span class="keyword">...</span><span class="comment">                     % Multiply by 2</span>
+            @cos, <span class="keyword">...</span><span class="comment">                           % Find cosine</span>
+            @(x) sprintf(<span class="string">'x is %.5f...'</span>, x)})   <span class="comment">% Return a string</span>
+</pre><pre class="codeoutput">ans = 
+    [6.2832]    [-1]    'x is 3.14159...'
+</pre><p>That takes care of <tt>map</tt>, which we can now use anywhere to send a set of inputs to numerous functions and collect their multiple outputs with brief and easy-to-read code.</p><p>By the way, writing these <b>functions that operate on other functions</b> is part of the "functional programming" style, and we're just scratching the surface. Let's go a little deeper and see how we can write a function to choose which function to apply from a list of functions.</p><h2>Inline Conditionals<a name="14"></a></h2><p>Sometimes an anonymous function might need a condition, like <tt>if...else</tt>. However, normal MATLAB syntax doesn't allow program flow statements like these in anonymous functions. Hope it not lost. We can implement an "inline if" in a single line:</p><pre class="codeinput">iif = @(varargin) varargin{2 * find([varargin{1:2:end}], 1, <span class="string">'first'</span>)}();
+</pre><p>Alright, that looks decidedly strange, so before we discuss how it works, take a look at how easy it is to use:</p><pre>   [out1, out2, ...] = iif( if this,      then run this, ...
+                            else if this, then run this, ...
+                            ...
+                            else,         then run this );</pre><p>All the "if this" conditions should evaluate to true or false. The "then run this" action next to the first true condition is executed. None of the other actions are executed! We could use this to make, for example, a safe normalization function to do the following:</p><div><ul><li>If not all values of <tt>x</tt> are finite, throw an error.</li><li>Else if all values of <tt>x</tt> are equal to 0, return zeros.</li><li>Else, return <tt>x/norm(x)</tt>.</li></ul></div><p>This is implemented below. Note the <tt>@()</tt> out in front of the actions. This means, "don't do this action, but <i>refer</i> to this action". That is, we're passing <i>pieces of code</i> to the <tt>iif</tt> function as <i>arguments</i>. In this way, we aren't actually doing all three things; we'll only call the action for the single case we need.</p><pre class="codeinput">normalize = @(x) iif( ~all(isfinite(x)), @() error(<span class="string">'Must be finite!'</span>), <span class="keyword">...</span>
+                      all(x == 0),       @() zeros(size(x)), <span class="keyword">...</span>
+                      true,              @() x/norm(x) );
+</pre><p>Test the nominal condition.</p><pre class="codeinput">normalize([1 1 0])
+</pre><pre class="codeoutput">ans =
+    0.7071    0.7071         0
+</pre><p>Test the error condition with non-finite inputs.</p><pre class="codeinput"><span class="keyword">try</span> normalize([0 inf 2]), <span class="keyword">catch</span> err, disp(err.message); <span class="keyword">end</span>
+</pre><pre class="codeoutput">Must be finite!
+</pre><p>Test the all-zeros condition.</p><pre class="codeinput">normalize([0 0 0])
+</pre><pre class="codeoutput">ans =
+     0     0     0
+</pre><p>Easy to use, right? We've implemented <tt>if... else</tt> behavior without needing an actual <tt>if</tt> or <tt>else</tt> anywhere! So now it's time to see how this thing works.</p><p>First, the <tt>iif</tt> function takes any number of arguments, thanks to <tt>varargin</tt>. These arguments will be condition 1 (true or false), action 1 (a function), condition 2, action 2, etc. First, the <tt>iif</tt> function selects all of the conditions (that's the odd numbered items in <tt>varargin</tt>) via <tt>[varargin{1:2:end}]</tt>. For our safe norm, this returns:</p><pre>   [~all(isfinite(x)), all(x == 0), true]</pre><p>Next, it finds the index of the first <tt>true</tt> value in those conditions with <tt>find(..., 1, 'first')</tt>. E.g., if <tt>~all(isfinite(x))</tt> was <tt>false</tt>, but <tt>all(x == 0)</tt> was <tt>true</tt>, the index would be 2.</p><p>The actions to perform are the even-numbered items of <tt>varargin</tt>, so we just multiply that index by 2 to get the index of the action to perform. Finally, we execute the action by appending <tt>()</tt> on the end, as in</p><pre>   varargin{...}()</pre><p>Did you catch what was happening there? We're passing little pieces of <i>code</i> as <i>inputs</i> to the <tt>iif</tt> function. <i>Functions</i> as <i>arguments</i>. See why this is called "functional" programming? I'll admit it looks weird at first, but once you've seen it, the pattern is hard to forget.</p><p><h1><center>Part 2</center></h1></p><p>In Part 1, we said that functional programming was marked by storing functions as variables (function handles) and working with functions that act on other functions. We put these ideas together to implement our own version of a <tt>map</tt> function for handling multiple inputs and outputs from multiple functions simultaneously, and we created <tt>iif</tt>, an "inline if", to allow the use of conditional statements inside of anonymous functions. So how might we work with recursive functions -- functions of themselves? We'll see how a functional programming style allows us to implement recursive functionality inside anonymous functions, and this will pave the way for the final part, in which we'll implement loops, without ever using <tt>for</tt> or <tt>while</tt> (which we can't use in anonymous functions).</p><h2>Anonymous Function Recursion<a name="21"></a></h2><p>Recall that a recursive function is a function that calls itself. It therefore needs some way to refer to itself. When we write an anonymous function, it isn't "named" (hence, "anonymous"), so it can't call itself by name. How can we get around this?</p><p>Let's start with a Fibonacci sequence example. Recall that the nth number of the Fibonacci sequence is the sum of the previous two numbers, starting with 1 and 1, yielding 1, 1, 2, 3, 5, 8, 13, 21, etc. This is easy to implement recursively.</p><pre>   fib = @(n) iif(n &lt;= 2, 1, ...                    % First two numbers
+                  true,   @() fib(n-1) + fib(n-2)); % All later numbers</pre><p>But hey, that can't work! We haven't defined <tt>fib</tt> yet, so how could this anonymous function call it? In fact, the anonymous function will never "know" we're referring to it as <tt>fib</tt>, so this won't work at all. Therefore, instead of trying to call <tt>fib</tt> directly, let's provide another input: the handle of a function to call, <tt>f</tt>.</p><pre class="codeinput">fib = @(f, n) iif(n &lt;= 2, 1, <span class="keyword">...</span><span class="comment">                      % First two numbers</span>
+                  true,   @() f(f, n-1) + f(f, n-2)); <span class="comment">% All later numbers</span>
+</pre><p>Getting closer. Now, if we pass <tt>fib</tt> <i>to</i> <tt>fib</tt> along with the number we want, it will call <tt>fib</tt>, passing in <tt>fib</tt> as the first argument, recursively until we get our answer.</p><pre class="codeinput">fib(fib, 6)
+</pre><pre class="codeoutput">ans =
+     8
+</pre><p>Ok, that's right. The sixth number of the sequence is 8. On the other hand, the syntax we've created is terrible. We have to provide the function to itself? I'd rather not. Instead, let's just write a new function that hands <tt>fib</tt> to <tt>fib</tt> along with the input <tt>n</tt>.</p><pre class="codeinput">fib2 = @(n) fib(fib, n);
+
+fib2(4)
+fib2(5)
+fib2(6)
+</pre><pre class="codeoutput">ans =
+     3
+ans =
+     5
+ans =
+     8
+</pre><p>That's a lot closer to what we want, but there's one more step. Let's write a function called <tt>recur</tt> to hand a function handle to itself, along with any other arguments. This makes recursion less cumbersome.</p><pre class="codeinput">recur = @(f, varargin) f(f, varargin{:});
+</pre><p>That was simple, so now let's re-write <tt>fib</tt>. The first argument to <tt>recur</tt> is the function, which we'll define inline. The second is <tt>n</tt>. That's all there is to it. It now reads as "Recursively call a function that, if <tt>k &lt;= 2</tt>, returns one, and otherwise returns the recursive function of <tt>k-1</tt> plus that of <tt>k-2</tt>, starting with the user's input <tt>n</tt>." (If it doesn't read quite this clearly at first, that's ok. It takes some getting used to. Comment liberally if necessary!)</p><pre class="codeinput">fib = @(n) recur(@(f, k) iif(k &lt;= 2, 1, <span class="keyword">...</span>
+                             true,   @() f(f, k-1) + f(f, k-2)), <span class="keyword">...</span>
+                 n);
+</pre><p>And we can find the first ten numbers of the sequence via <tt>arrayfun</tt>.</p><pre class="codeinput">arrayfun(fib, 1:10)
+</pre><pre class="codeoutput">ans =
+     1     1     2     3     5     8    13    21    34    55
+</pre><p>Factorial (f(n) = 1 * 2 * 3 * ... n) is another easy operation to represent recursively.</p><pre class="codeinput">factorial = @(n) recur(@(f, k) iif(k == 0, 1, <span class="keyword">...</span>
+                                   true,   @() k * f(f, k-1)), n);
+arrayfun(factorial, 1:7)
+</pre><pre class="codeoutput">ans =
+  Columns 1 through 6
+           1           2           6          24         120         720
+  Column 7
+        5040
+</pre><p>A number to an integer power has a nearly identical form. Here's <tt>4.^(0:5)</tt>.</p><pre class="codeinput">pow = @(x, n) recur(@(f, k) iif(k == 0, 1, <span class="keyword">...</span>
+                                true,   @() x * f(f, k-1)), n);
+arrayfun(@(n) pow(4, n), 0:5)
+</pre><pre class="codeoutput">ans =
+           1           4          16          64         256        1024
+</pre><p>That was a big step for anonymous functions, using both recursion and an inline conditional together with ease. Like <tt>map</tt> and <tt>iif</tt>, <tt>recur</tt>, looks strange at first, but once it's been seen, it's hard to forget how it works (just make one of the inputs a function handle and pass it to itself). And recursion doesn't have to stop at interesting mathematical sequences of numbers. For instance, in the next part, we'll use this to implement loops in, but first, we'll need a some helper functions and a good way to execute multiple statements in an anonymous function.</p><h2>Helpers<a name="30"></a></h2><p>These little functions are useful in many circumstances, and we're going to need <tt>curly</tt> frequently.</p><pre class="codeinput">paren = @(x, varargin) x(varargin{:});
+curly = @(x, varargin) x{varargin{:}};
+</pre><p>They allow us to write <tt>x(3, 4)</tt> as <tt>paren(x, 3, 4)</tt> and similarly for curly braces. That is, now we can think of parentheses and curly braces as functions! At first this might not seem useful. However, imagine writing a function to return the width and height of the screen. The data we need is available from this call:</p><pre class="codeinput">get(0, <span class="string">'ScreenSize'</span>)
+</pre><pre class="codeoutput">ans =
+           1           1        1600         900
+</pre><p>However, we don't need those preceeding ones. We could save the output to a variable, say <tt>x</tt>, and then access x(3:4), but if we need this in an anonymous function, we can't save to a variable. How do we access just elements 3 and 4? There are numerous ways, but <tt>paren</tt> and <tt>curly</tt> are similar to constructs found in other languages and are easy to use, so we'll use those here.</p><p>Now we can write our <tt>screen_size</tt> function to return just the data we want.</p><pre class="codeinput">screen_size = @() paren(get(0, <span class="string">'ScreenSize'</span>), 3:4);
+
+screen_size()
+</pre><pre class="codeoutput">ans =
+        1600         900
+</pre><p>While on the subject, note that we can actually use any number of indices or even ':'.</p><pre class="codeinput">magic(3)
+paren(magic(3), 1:2, 2:3)
+paren(magic(3), 1:2, :)
+</pre><pre class="codeoutput">ans =
+     8     1     6
+     3     5     7
+     4     9     2
+ans =
+     1     6
+     5     7
+ans =
+     8     1     6
+     3     5     7
+</pre><p>We do the same with the curly braces. Here, the regular expression pattern will match both 'rain' and 'Spain', but we'll only select the second match.</p><pre class="codeinput">spain = curly(regexp(<span class="string">'The rain in Spain....'</span>, <span class="string">'\s(\S+ain)'</span>, <span class="string">'tokens'</span>), 2)
+</pre><pre class="codeoutput">spain = 
+    'Spain'
+</pre><p>It also works with ':' (note that the single quotes are required).</p><pre class="codeinput">[a, b] = curly({<span class="string">'the_letter_a'</span>, <span class="string">'the_letter_b'</span>}, <span class="string">':'</span>)
+</pre><pre class="codeoutput">a =
+the_letter_a
+b =
+the_letter_b
+</pre><h2>Executing Multiple Statements<a name="36"></a></h2><p>With <tt>curly</tt> in place, let's examine something a little different. Consider the following:</p><pre class="codeinput">do_three_things = @() {fprintf(<span class="string">'This is the first thing.\n'</span>), <span class="keyword">...</span>
+                       fprintf(<span class="string">'This is the second thing.\n'</span>), <span class="keyword">...</span>
+                       max(eig(magic(3)))};
+
+do_three_things()
+</pre><pre class="codeoutput">This is the first thing.
+This is the second thing.
+ans = 
+    [25]    [26]    [15.0000]
+</pre><p>We've executed three statements on a single line. All of the outputs are stored in the cell array (note that the output from <tt>fprintf</tt> is a number, but we don't care what it means here).</p><p>Let's say we want to write a function to:</p><div><ol><li>Create a small figure in the middle of the screen</li><li>Plot some random points</li><li>Return the handles of the figure and the plot</li></ol></div><p>Then by storing all of the outputs in a cell array and using <tt>curly</tt> to access the outputs we care about, we can make a multi-line function with multiple outputs, all in a simple anonymous funciton.</p><pre class="codeinput">dots = @() curly({<span class="keyword">...</span>
+    figure(<span class="string">'Position'</span>, [0.5*screen_size() - [100 50], 200, 100], <span class="keyword">...</span>
+           <span class="string">'MenuBar'</span>,  <span class="string">'none'</span>), <span class="keyword">...</span><span class="comment">                % Position the figure</span>
+    plot(randn(1, 100), randn(1, 100), <span class="string">'.'</span>)}, <span class="keyword">...</span><span class="comment">  % Plot random points</span>
+    <span class="string">':'</span>);                                          <span class="comment">% Return everything</span>
+
+[h_figure, h_dots] = dots()
+</pre><pre class="codeoutput">h_figure =
+     1
+h_dots =
+  177.0016
+</pre><img vspace="5" hspace="5" src="functional_programming_examples_01.png" alt=""> <p>(As a quick aside, note that if a statement doesn't return anything, we can't put it in a cell array, and so we can't use it this way. There are ways around this; one is to use the included <tt>void</tt> function. See <tt>help void</tt> for details.)</p><p>That takes care of recursion and multi-line statements in anonymous functions, so now we're ready for loops.</p><pre class="codeinput">close <span class="string">all</span>;
+</pre><p><h1><center>Part 3</center></h1></p><h2>Loops<a name="41"></a></h2><p>Note that the recursive sequences we created in the last part could also have been implemented with <tt>for</tt> loops. For instance, here's factorial of <tt>n</tt>:</p><pre>   factorial = 1;
+   for k = 1:n
+       factorial = k * factorial;
+   end</pre><p>Many times, recursive functions can be written iteratively in loops. However, we can't use <tt>for</tt> or <tt>while</tt> in an anonymous function, so instead of asking how we can unwrap recursive functions into iterative loops, let's ask the reverse: how can we implement loops with recursive functions?</p><h2>Loops via Recursion<a name="42"></a></h2><p>To loop properly, one must know:</p><div><ul><li>What to do each iteration</li><li>If the process should continue to the next iteration</li><li>What's available when the loop begins</li></ul></div><p>Allowing the "what to do" to be a function (<tt>fcn</tt>) of some state (<tt>x</tt>), the "if it should continue" to be another function (<tt>cont</tt>) of the state, and "what's available when the loop begins" to be the initial state (<tt>x0</tt>), we can write a <tt>loop</tt> function.</p><p>On each step, the loop function will call the <tt>cont</tt> function. If that returns false (i.e., we shouldn't continue), the current state, <tt>x</tt>, is returned. Otherwise, if we <i>should</i> continue, it calls <tt>fcn</tt> on the current state, and passes the output from that to the next iteration. Letting this single iteration be denoted as <tt>f</tt>, it's easy to build the anonymous function <tt>loop</tt> using our <tt>recur</tt> function.</p><pre class="codeinput">loop = @(x0, cont, fcn) <span class="keyword">...</span><span class="comment">                                 % Header</span>
+       recur(@(f, x) iif( ~cont(x), x, <span class="keyword">...</span><span class="comment">                  % Continue?</span>
+                          true,     @() f(f, fcn(x)) ), <span class="keyword">...</span><span class="comment"> %   Iterate</span>
+             x0);                                           <span class="comment">% from x0.</span>
+</pre><p>For this trivial example, the state is simply the iteration count. We'll increase the count every iteration until the count <tt>&gt;= n</tt> and return the final count. All this does therefore is count from 0 to the input n. Not very interesting, but it demonstrates the loop.</p><pre class="codeinput">count = @(n) loop(0, <span class="keyword">...</span><span class="comment">            % Initialize state, k, to 0</span>
+                  @(k) k &lt; n, <span class="keyword">...</span><span class="comment">   % While k &lt; n</span>
+                  @(k) k + 1);      <span class="comment">%   k = k + 1</span>
+
+arrayfun(count, 1:10)
+</pre><pre class="codeoutput">ans =
+     1     2     3     4     5     6     7     8     9    10
+</pre><p>Recall from the last part that we can implement multiple statements inside a cell array and can then return whatever output we need. We'll use that technique here to make our loops have more complex behavior.</p><p>In the example below, the state is still the iteration count, but on each iteration, we'll print something out, storing its result (a number) in the first position of a cell array, and we'll add 1 to <tt>k</tt>, storing the result in the second position. We'll use <tt>curly</tt> to return only the second position. In this way, on every iteration, we'll print something and update the counter. Here's the pseudocode.</p><pre>   Set k to 1.
+   While k &lt;= 4
+     Print something out.
+     Store k+1.             &lt;- Return this value as k
+   End</pre><p>The code then proceeds this way:</p><pre class="codeinput">pets = {<span class="string">'cat'</span>, <span class="string">'dog'</span>, <span class="string">'bird'</span>, <span class="string">'fish'</span>};
+describe_pet = @(pet) fprintf(<span class="string">'I have a %s.\n'</span>, pet);
+
+declare_my_pets = @() loop(<span class="keyword">...</span><span class="comment">              % Loop</span>
+    1, <span class="keyword">...</span><span class="comment">                                  % From k = 1</span>
+    @(k) k &lt;= 4, <span class="keyword">...</span><span class="comment">                        % While k &lt;= 4</span>
+    @(k) curly({ describe_pet(pets{k}), <span class="keyword">...</span><span class="comment"> %   Step 1: Print something</span>
+                 k + 1 }, <span class="keyword">...</span><span class="comment">               %   Step 2: Add 1 to k</span>
+               2));                         <span class="comment">%   Return output from step 2</span>
+
+<span class="comment">% Call our anonymous function that loops.</span>
+declare_my_pets();
+</pre><pre class="codeoutput">I have a cat.
+I have a dog.
+I have a bird.
+I have a fish.
+</pre><p>I'll be the first to admit that the loop is a bit longer and much more rigid than a normal MATLAB loop. On the other hand, it can be used in anonymous functions, and its syntax has a certain cleanliness to it in that it doesn't modify any variables that live outside the loop; it has its own scope. This is one nice feature of <tt>loop</tt> being a <i>function</i> that takes <i>code</i> (functions) as arguments.</p><p>Consider that the state we're using could be anything, whether a simple scalar that keeps a count of the number of iterations like those above, a cell array holding multiple values, a structure, or even an object. We'll use and update this state on every iteration. When we're done, the state is returned. Before we show the use of more complex states though, let's first make a better loop.</p><h2>A Better Loop<a name="46"></a></h2><p>Let's make handling the state a bit easier. If instead of handing <tt>x</tt> into the functions, we let <tt>x</tt> be a cell array of arguments to those functions, things get a little easier to use. Then, <tt>fcn</tt> must return a cell array of arguments to the next call to <tt>fcn</tt> or <tt>cont</tt>. All we have to do to implement this is append <tt>{:}</tt> to the end of <tt>x</tt> when we use it. The <tt>factorial</tt> example below makes this much clearer.</p><p>As one final convenience, instead of returning the full state at the very end, we'll add a <tt>cleanup</tt> function to only return the important parts of the state. For instance, the state might contain an iteration counter, but we don't need this after the loop is done, so the <tt>cleanup</tt> will simply not return this part.</p><pre class="codeinput">loop = @(x0, cont, fcn, cleanup) <span class="keyword">...</span><span class="comment">                            % Header</span>
+       recur(@(f, x) iif(~cont(x{:}), cleanup(x{:}), <span class="keyword">...</span><span class="comment">        % Continue?</span>
+                         true,        @() f(f, fcn(x{:}))), <span class="keyword">...</span><span class="comment"> %   Iterate</span>
+             x0);                                               <span class="comment">% from x0.</span>
+</pre><p>For this implementation of factorial, we'll keep our iteration count, <tt>k</tt>, and the previous products, <tt>x</tt>, in a cell array. According to the change we made above, this means <tt>x</tt> and <tt>k</tt> will be handed to our functions now.</p><pre class="codeinput">factorial = @(n) loop({1, 1}, <span class="keyword">...</span><span class="comment">         % Start with k = 1 and x = 1</span>
+                      @(k,x) k &lt;= n, <span class="keyword">...</span><span class="comment">  % While k &lt;= n</span>
+                      @(k,x) {k + 1, <span class="keyword">...</span><span class="comment">  %   k = k + 1;</span>
+                              k * x}, <span class="keyword">...</span><span class="comment"> %   x = k * x;</span>
+                      @(k,x) x);          <span class="comment">% End, returning x</span>
+
+<span class="comment">% First 7 numbers of the factorial sequence</span>
+arrayfun(factorial, 1:7)
+</pre><pre class="codeoutput">ans =
+  Columns 1 through 6
+           1           2           6          24         120         720
+  Column 7
+        5040
+</pre><p>As a practical note, recall that because these loops use recursion, there's a limit to the number of times they can loop (MATLAB has a recursion limit, which is a setting in Preferences). Also, a recursive implementation of a loop isn't the most efficient. For this reason, it's best to implement <tt>loop</tt> as a <tt>.m</tt> file that can then be used in the same way.</p><pre>   function x = loop(x, cont, f, cleanup)
+       while ~cont(x{:})
+           x = f(x{:});
+       end
+       if nargin == 4
+           x = cleanup(x{:});
+       end
+   end</pre><p>This brings us to our final example. Below, we'll simulate a simple harmonic oscillator, using a structure to store dissimilar states, including a complete time history of the oscillator.</p><pre class="codeinput"><span class="comment">% First, calculate a state transition matrix that represents a harmonic</span>
+<span class="comment">% oscillator with damping.</span>
+Phi = expm(0.5*[0 1; -1 -0.2]);
+
+<span class="comment">% Now create the loop.</span>
+x   = loop({[1; 0], 1}, <span class="keyword">...</span><span class="comment">                  % Initial state</span>
+           @(x,k) k &lt;= 100, <span class="keyword">...</span><span class="comment">              % While k &lt;= 100</span>
+           @(x,k) {[x, Phi * x(:, end)], <span class="keyword">...</span><span class="comment"> %   Update x</span>
+                   k + 1}, <span class="keyword">...</span><span class="comment">               %   Update k</span>
+           @(x,k) x);                        <span class="comment">% End, return x</span>
+
+<span class="comment">% Create a plot function.</span>
+plot_it = @(n, x, y, t) {subplot(2, 1, n), <span class="keyword">...</span><span class="comment">            % Select subplot.</span>
+                         plot(x), <span class="keyword">...</span><span class="comment">                     % Plot the data.</span>
+                         iif(nargin==4, @() title(t), <span class="keyword">...</span><span class="comment"> % If there's a</span>
+                             true,        []), <span class="keyword">...</span><span class="comment">        % title, add it.</span>
+                         ylabel(y), <span class="keyword">...</span><span class="comment">                   % Label y</span>
+                         xlabel(<span class="string">'Time (s)'</span>)};             <span class="comment">% and x axes.</span>
+
+<span class="comment">% Plot the result.</span>
+plot_it(1, x(1, :), <span class="string">'Position (m)'</span>, <span class="string">'Harmonic Oscillator'</span>);
+plot_it(2, x(2, :), <span class="string">'Velocity (m/s)'</span>);
+</pre><img vspace="5" hspace="5" src="functional_programming_examples_02.png" alt=""> <p>That's it for loops via recursion!</p><h2>Summary<a name="51"></a></h2><p>Let's look back at what we did over these three parts. First, we started with a simple <tt>map</tt> utility function to demonstrate the function-of-functions idea. Then we created our ubiquitous inline if, which further enabled recursion (a conditional is necessary to make recursion stop!). We also showed using multiple statements by storing their outputs in a cell array. Finally, we created a <tt>loop</tt> construct on top of our recursion functions. Here they are as brief anonymous function.</p><pre class="codeinput">map   = @(val, fcns) cellfun(@(f) f(val{:}), fcns);
+mapc  = @(val, fcns) cellfun(@(f) f(val{:}), fcns, <span class="string">'UniformOutput'</span>, false);
+iif   = @(varargin) varargin{2*find([varargin{1:2:end}], 1, <span class="string">'first'</span>)}();
+recur = @(f, varargin) f(f, varargin{:});
+paren = @(x, varargin) x(varargin{:});
+curly = @(x, varargin) x{varargin{:}};
+loop  = @(x,c,f,r) recur(@(g,y) iif(~c(y{:}),r(y{:}),1,@()g(g,f(y{:}))),x);
+</pre><p>At this point, we've done more than just scratch the surface of functional programming. We've used MATLAB's interesting constructs, such as function handles, cell arrays, and <tt>varargin</tt> to implement a functional programming framework, allowing a new syntax within MATLAB, where code can be arguments to flow control functions.</p><p>Thanks for reading. I hope this has both enabled a new level of detail in anonymous functions in MATLAB and helped demonstrate the wide range of possibilities available within the MATLAB language.</p><p>Enjoy!</p><p>- Tucker McClure</p><h2>Addendum<a name="53"></a></h2><p>Several additional files are included with the File Exchange submission that weren't included in the blog posts. These include (documentation will appear in the command window):</p><div><ul><li><tt>dowhile</tt> (<a href="matlab:clc;help('dowhile')">matlab:clc;help('dowhile')</a>)</li><li><tt>forloop</tt> (<a href="matlab:clc;help('forloop')">matlab:clc;help('forloop')</a>)</li><li><tt>last</tt>    (<a href="matlab:clc;help('last')">matlab:clc;help('last')</a>)</li><li><tt>output</tt>  (<a href="matlab:clc;help('output')">matlab:clc;help('output')</a>)</li><li><tt>tern</tt>    (<a href="matlab:clc;help('tern')">matlab:clc;help('tern')</a>)</li><li><tt>use</tt>     (<a href="matlab:clc;help('use')">matlab:clc;help('use')</a>)</li><li><tt>void</tt>    (<a href="matlab:clc;help('void')">matlab:clc;help('void')</a>)</li><li><tt>wrap</tt>    (<a href="matlab:clc;help('wrap')">matlab:clc;help('wrap')</a>)</li></ul></div><p>Each contains its own documention and examples.</p><p class="footer">Copyright 2013 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Introduction to Functional Programming with Anonymous Functions
+%
+% The following document was built from posts written for the blog "Loren
+% on the Art of MATLAB". The ideas presented below in anonymous functions
+% have been written as |.m| files so that they might be placed on the
+% MATLAB path. The |.m| versions are the same as below or slightly expanded
+% where appropriate.
+%
+% The best way to view this document is to open it in the MATLAB editor and
+% click "Publish" or enter the following at the command line:
+%
+%    open(publish('functional_programming_examples.m'))
+%
+% Tucker McClure
+% Copyright 2013 The MathWorks, Inc.
+
+%% The Goal
+% I use a lot of anonymous functions. They're nice and compact and almost 
+% invisible in their simplicity. Plus, if I can write an anonymous function
+% to do something, I don't need to write a |.m| file, and that can save me
+% from file clutter on larger projects and from having to send someone a
+% dozen files instead of sending one clean script. However, it seems at
+% first glance like anonymous functions must necessarily be simple. No
+% |if... else|, |while|, |for|, or any other keywords can be used. So how
+% could we possibly write sophisticated programs in anonymous functions?
+% We'll see, and it will involve some ideas from functional programming.
+%
+% The goal of this introduction is to demonstrate how a few of these
+% techniques can change the way we work in MATLAB, allowing greater brevity
+% and simultaneously increasing functionality. There are three parts. In
+% the first part, we'll present creating functions of functions and
+% treating functions as variables (in MATLAB, that means function handles),
+% and from there, we'll move on to implementing conditional statements
+% (like |if... else|) in anonymous functions. In the next part, we'll add
+% recursion and executing multiple statements inside an anonymous function.
+% In the final part, we'll develope a loop function. But first, if 
+% "function handle" or "anonymous function" is new to you, go check out 
+% Loren’s great introductions to those ideas on her blog, Loren on the Art 
+% of MATLAB.
+%
+% <http://blogs.mathworks.com/loren/>
+
+%%
+% <html><h1><center>Part 1</center></h1></html>
+
+%% Minimum and Maximum Example
+% Let's say we want to write a function to find the minimum and maximum of
+% a set of numbers and store the results in an array. Here's a first pass:
+
+min_and_max = @(x) [min(x), max(x)];
+min_and_max([3 4 1 6 2])
+
+%%
+% Our |min_and_max| function takes in an array that we'll call |x|, finds
+% the minimum and maximum, and stores the two results in an output array.
+% Clear? Good. But now let's make it more difficult. The |min| and |max|
+% functions both return _two_ outputs if desired (both the minimum or 
+% maximum _and_ the index at which they occur in the input array). Our
+% simple |min_and_max| function can't get those secondary outputs! How can
+% we access them? Consider this odd-looking line.
+
+[extrema, indices] = cellfun(@(f) f([3 4 1 6 2]), {@min, @max})
+
+%%
+% Well, that clearly worked. The minimum, 1, occurs at index 3. The
+% maximum, 6, occurs at index 4, but what is this line actually doing?
+% First, recall how |cellfun| behaves. The first argument is a _function
+% handle_. The second argument is a cell array of whatever. Each element of
+% the cell array is given as an argument to the provided function handle.
+% Most of the time, that cell array is full of data, and each piece of data
+% is passed to the function. However, we could just as easily put function
+% handles in the cell array. Then the first function (|@(f) f(...)|) _acts
+% on all the other functions_. So, first |@min| is passed in for |f| and
+% the outputs from |min([3 4 1 6 2])| are stored. Then, |@max| is passed in
+% for |f|, and its outputs are stored.
+%
+% Ok, now that we're working with functions of functions, let's remove that
+% hard-coded |[3 4 1 6 2]| and write a new |min_and_max| function by simply
+% adding a |@(x)| out front and changing |[3 4 1 6 2]| to |x|.
+
+min_and_max = @(x) cellfun(@(f) f(x), {@min, @max});
+
+%%
+% We can now use |min_and_max| for just the extrema, like before, but we 
+% can also get the indices too.
+
+y = randi(10, 1, 10)
+just_values        = min_and_max(y)
+[~, just_indices]  = min_and_max(y)
+[extrema, indices] = min_and_max(y)
+
+%%
+% That might have looked a little funny, but it's pretty easy to think
+% about, right? Now let's make it look a little nicer too.
+
+%% Map
+% Above, we're mapping each function to our input |x|. More generally, we
+% might write a "map" function to map a series of functions to the input
+% values. We'll make |val| a cell array so we can also send multiple inputs
+% to multiple functions all at once. This is like what we had before, but 
+% re-arranged a bit.
+
+map = @(val, fcns) cellfun(@(f) f(val{:}), fcns);
+
+%%
+% Look how simple this makes |min_and_max| (below), while still accessing
+% both outputs. Not only is it shorter to write than any other versions so
+% far, it's easier to read, with hardly anything but a single occurrence of
+% each variable or function name. "Map |x| to the |min| and |max| 
+% functions". No problem.
+
+x = [3 4 1 6 2];
+[extrema, indices] = map({x}, {@min, @max})
+
+%%
+% Let's try multiple inputs:
+
+map({1, 2}, {@plus, @minus, @times})
+
+%%
+% What if outputs are different sizes? We'll write |mapc| (as in MAP with 
+% Cell array outputs) to handle this; all it needs is an extra argument to 
+% |cellfun| to say that our output isn't uniform in size.
+
+mapc = @(val, fcns) cellfun(@(f) f(val{:}), fcns, 'UniformOutput', false);
+
+%%
+% Send |pi| to multiple functions that return differently-sized arrays. The
+% first output is a scalar, the second is a scalar, and the third is a 
+% string.
+
+mapc({pi}, {@(x) 2 * x, ...                     % Multiply by 2
+            @cos, ...                           % Find cosine
+            @(x) sprintf('x is %.5f...', x)})   % Return a string
+
+%%
+% That takes care of |map|, which we can now use anywhere to send a set of 
+% inputs to numerous functions and collect their multiple outputs with
+% brief and easy-to-read code.
+%
+% By the way, writing these *functions that operate on other functions* is
+% part of the "functional programming" style, and we're just scratching the
+% surface. Let's go a little deeper and see how we can write a function to 
+% choose which function to apply from a list of functions.
+
+%% Inline Conditionals
+% Sometimes an anonymous function might need a condition, like |if...else|.
+% However, normal MATLAB syntax doesn't allow program flow statements like
+% these in anonymous functions. Hope it not lost. We can implement an
+% "inline if" in a single line:
+
+iif = @(varargin) varargin{2 * find([varargin{1:2:end}], 1, 'first')}();
+
+%%
+% Alright, that looks decidedly strange, so before we discuss how it works,
+% take a look at how easy it is to use:
+%
+%     [out1, out2, ...] = iif( if this,      then run this, ...
+%                              else if this, then run this, ...
+%                              ...
+%                              else,         then run this );
+%
+% All the "if this" conditions should evaluate to true or false. The "then
+% run this" action next to the first true condition is executed. None of
+% the other actions are executed! We could use this to make, for example, a
+% safe normalization function to do the following:
+%
+% * If not all values of |x| are finite, throw an error.
+% * Else if all values of |x| are equal to 0, return zeros.
+% * Else, return |x/norm(x)|.
+%
+% This is implemented below. Note the |@()| out in front of the actions. 
+% This means, "don't do this action, but _refer_ to this action". That is,
+% we're passing _pieces of code_ to the |iif| function as _arguments_. In
+% this way, we aren't actually doing all three things; we'll only call the
+% action for the single case we need.
+
+normalize = @(x) iif( ~all(isfinite(x)), @() error('Must be finite!'), ...
+                      all(x == 0),       @() zeros(size(x)), ...
+                      true,              @() x/norm(x) );
+                 
+%%
+% Test the nominal condition.
+normalize([1 1 0])
+
+%%
+% Test the error condition with non-finite inputs.
+try normalize([0 inf 2]), catch err, disp(err.message); end
+
+%%
+% Test the all-zeros condition.
+normalize([0 0 0])
+
+%%
+% Easy to use, right? We've implemented |if... else| behavior without
+% needing an actual |if| or |else| anywhere! So now it's time to see how
+% this thing works.
+%
+% First, the |iif| function takes any number of arguments, thanks to
+% |varargin|. These arguments will be condition 1 (true or false), action 1
+% (a function), condition 2, action 2, etc. First, the |iif| function
+% selects all of the conditions (that's the odd numbered items in
+% |varargin|) via |[varargin{1:2:end}]|. For our safe norm, this returns:
+%
+%     [~all(isfinite(x)), all(x == 0), true]
+%
+% Next, it finds the index of the first |true| value in those conditions
+% with |find(..., 1, 'first')|. E.g., if |~all(isfinite(x))| was |false|,
+% but |all(x == 0)| was |true|, the index would be 2.
+%
+% The actions to perform are the even-numbered items of |varargin|, so we
+% just multiply that index by 2 to get the index of the action to perform.
+% Finally, we execute the action by appending |()| on the end, as in
+%
+%     varargin{...}()
+% 
+% Did you catch what was happening there? We're passing little pieces of
+% _code_ as _inputs_ to the |iif| function. _Functions_ as _arguments_. 
+% See why this is called "functional" programming? I'll admit it looks 
+% weird at first, but once you've seen it, the pattern is hard to forget.
+
+%%
+% <html><h1><center>Part 2</center></h1></html>
+%
+% In Part 1, we said that functional programming was marked by storing
+% functions as variables (function handles) and working with functions that
+% act on other functions. We put these ideas together to implement our own
+% version of a |map| function for handling multiple inputs and outputs from
+% multiple functions simultaneously, and we created |iif|, an "inline if",
+% to allow the use of conditional statements inside of anonymous functions.
+% So how might we work with recursive functions REPLACE_WITH_DASH_DASH functions of themselves?
+% We'll see how a functional programming style allows us to implement
+% recursive functionality inside anonymous functions, and this will pave
+% the way for the final part, in which we'll implement loops, without ever 
+% using |for| or |while| (which we can't use in anonymous functions).
+
+%% Anonymous Function Recursion
+% Recall that a recursive function is a function that calls itself. It 
+% therefore needs some way to refer to itself. When we write an anonymous 
+% function, it isn't "named" (hence, "anonymous"), so it can't call itself
+% by name. How can we get around this?
+%
+% Let's start with a Fibonacci sequence example. Recall that the nth number
+% of the Fibonacci sequence is the sum of the previous two numbers, 
+% starting with 1 and 1, yielding 1, 1, 2, 3, 5, 8, 13, 21, etc. This is 
+% easy to implement recursively.
+%
+%     fib = @(n) iif(n <= 2, 1, ...                    % First two numbers
+%                    true,   @() fib(n-1) + fib(n-2)); % All later numbers
+%
+% But hey, that can't work! We haven't defined |fib| yet, so how could
+% this anonymous function call it? In fact, the anonymous function will
+% never "know" we're referring to it as |fib|, so this won't work at all. 
+% Therefore, instead of trying to call |fib| directly, let's provide
+% another input: the handle of a function to call, |f|.
+
+fib = @(f, n) iif(n <= 2, 1, ...                      % First two numbers            
+                  true,   @() f(f, n-1) + f(f, n-2)); % All later numbers
+
+%%
+% Getting closer. Now, if we pass |fib| _to_ |fib| along with the number we
+% want, it will call |fib|, passing in |fib| as the first argument, 
+% recursively until we get our answer.
+
+fib(fib, 6)
+
+%%
+% Ok, that's right. The sixth number of the sequence is 8. On the other 
+% hand, the syntax we've created is terrible. We have to provide the
+% function to itself? I'd rather not. Instead, let's just write a new
+% function that hands |fib| to |fib| along with the input |n|.
+
+fib2 = @(n) fib(fib, n);
+
+fib2(4)
+fib2(5)
+fib2(6)
+
+%%
+% That's a lot closer to what we want, but there's one more step. Let's
+% write a function called |recur| to hand a function handle to itself, 
+% along with any other arguments. This makes recursion less cumbersome.
+
+recur = @(f, varargin) f(f, varargin{:});
+
+%%
+% That was simple, so now let's re-write |fib|. The first argument to
+% |recur| is the function, which we'll define inline. The second is |n|.
+% That's all there is to it. It now reads as "Recursively call a function
+% that, if |k <= 2|, returns one, and otherwise returns the recursive
+% function of |k-1| plus that of |k-2|, starting with the user's input
+% |n|." (If it doesn't read quite this clearly at first, that's ok. It
+% takes some getting used to. Comment liberally if necessary!)
+
+fib = @(n) recur(@(f, k) iif(k <= 2, 1, ...
+                             true,   @() f(f, k-1) + f(f, k-2)), ...
+                 n);
+
+%%
+% And we can find the first ten numbers of the sequence via |arrayfun|.
+
+arrayfun(fib, 1:10)
+
+%%
+% Factorial (f(n) = 1 * 2 * 3 * ... n) is another easy operation to 
+% represent recursively.
+
+factorial = @(n) recur(@(f, k) iif(k == 0, 1, ...
+                                   true,   @() k * f(f, k-1)), n);
+arrayfun(factorial, 1:7)
+
+%%
+% A number to an integer power has a nearly identical form. Here's 
+% |4.^(0:5)|.
+
+pow = @(x, n) recur(@(f, k) iif(k == 0, 1, ...
+                                true,   @() x * f(f, k-1)), n);
+arrayfun(@(n) pow(4, n), 0:5)
+
+%%
+% That was a big step for anonymous functions, using both recursion and an
+% inline conditional together with ease. Like |map| and |iif|, |recur|, 
+% looks strange at first, but once it's been seen, it's hard to forget how 
+% it works (just make one of the inputs a function handle and pass it to 
+% itself). And recursion doesn't have to stop at interesting mathematical 
+% sequences of numbers. For instance, in the next part, we'll use this to 
+% implement loops in, but first, we'll need a some helper functions and a
+% good way to execute multiple statements in an anonymous function.
+
+%% Helpers
+% These little functions are useful in many circumstances, and we're going
+% to need |curly| frequently.
+
+paren = @(x, varargin) x(varargin{:});
+curly = @(x, varargin) x{varargin{:}};
+
+%%
+% They allow us to write |x(3, 4)| as |paren(x, 3, 4)| and similarly for 
+% curly braces. That is, now we can think of parentheses and curly braces 
+% as functions! At first this might not seem useful. However, imagine 
+% writing a function to return the width and height of the screen. The data
+% we need is available from this call:
+
+get(0, 'ScreenSize')
+
+%%
+% However, we don't need those preceeding ones. We could save the output to
+% a variable, say |x|, and then access x(3:4), but if we need this in an
+% anonymous function, we can't save to a variable. How do we access just
+% elements 3 and 4? There are numerous ways, but |paren| and |curly| are
+% similar to constructs found in other languages and are easy to use, so
+% we'll use those here.
+%
+% Now we can write our |screen_size| function to return just the data we
+% want.
+
+screen_size = @() paren(get(0, 'ScreenSize'), 3:4);
+
+screen_size()
+
+%%
+% While on the subject, note that we can actually use any number of
+% indices or even ':'.
+
+magic(3)
+paren(magic(3), 1:2, 2:3)
+paren(magic(3), 1:2, :)
+
+%%
+% We do the same with the curly braces. Here, the regular expression 
+% pattern will match both 'rain' and 'Spain', but we'll only select the 
+% second match.
+
+spain = curly(regexp('The rain in Spain....', '\s(\S+ain)', 'tokens'), 2)
+
+%%
+% It also works with ':' (note that the single quotes are required).
+
+[a, b] = curly({'the_letter_a', 'the_letter_b'}, ':')
+
+%% Executing Multiple Statements
+% With |curly| in place, let's examine something a little different.
+% Consider the following:
+
+do_three_things = @() {fprintf('This is the first thing.\n'), ...
+                       fprintf('This is the second thing.\n'), ...
+                       max(eig(magic(3)))};
+                   
+do_three_things()
+
+%%
+% We've executed three statements on a single line. All of the outputs are
+% stored in the cell array (note that the output from |fprintf| is a
+% number, but we don't care what it means here).
+%
+% Let's say we want to write a function to:
+% 
+% # Create a small figure in the middle of the screen
+% # Plot some random points
+% # Return the handles of the figure and the plot
+%
+% Then by storing all of the outputs in a cell array and using |curly| to
+% access the outputs we care about, we can make a multi-line function with
+% multiple outputs, all in a simple anonymous funciton.
+
+dots = @() curly({...
+    figure('Position', [0.5*screen_size() - [100 50], 200, 100], ...
+           'MenuBar',  'none'), ...                % Position the figure
+    plot(randn(1, 100), randn(1, 100), '.')}, ...  % Plot random points
+    ':');                                          % Return everything
+
+[h_figure, h_dots] = dots()
+
+%%
+% (As a quick aside, note that if a statement doesn't return anything, we
+% can't put it in a cell array, and so we can't use it this way. There are
+% ways around this; one is to use the included |void| function. See |help
+% void| for details.)
+
+%%
+% That takes care of recursion and multi-line statements in anonymous 
+% functions, so now we're ready for loops.
+
+close all;
+
+%%
+% <html><h1><center>Part 3</center></h1></html>
+
+%% Loops
+% Note that the recursive sequences we created in the last part could also
+% have been implemented with |for| loops. For instance, here's factorial 
+% of |n|:
+% 
+%     factorial = 1;
+%     for k = 1:n
+%         factorial = k * factorial;
+%     end
+% 
+% Many times, recursive functions can be written iteratively in loops.
+% However, we can't use |for| or |while| in an anonymous function, so 
+% instead of asking how we can unwrap recursive functions into iterative 
+% loops, let's ask the reverse: how can we implement loops with recursive 
+% functions?
+
+%% Loops via Recursion
+% To loop properly, one must know:
+% 
+% * What to do each iteration
+% * If the process should continue to the next iteration
+% * What's available when the loop begins
+% 
+% Allowing the "what to do" to be a function (|fcn|) of some state (|x|),
+% the "if it should continue" to be another function (|cont|) of the state,
+% and "what's available when the loop begins" to be the initial state 
+% (|x0|), we can write a |loop| function.
+%
+% On each step, the loop function will call the |cont| function. If that 
+% returns false (i.e., we shouldn't continue), the current state, |x|, is 
+% returned. Otherwise, if we _should_ continue, it calls |fcn| on the 
+% current state, and passes the output from that to the next iteration. 
+% Letting this single iteration be denoted as |f|, it's easy to build the 
+% anonymous function |loop| using our |recur| function.
+
+loop = @(x0, cont, fcn) ...                                 % Header
+       recur(@(f, x) iif( ~cont(x), x, ...                  % Continue?
+                          true,     @() f(f, fcn(x)) ), ... %   Iterate
+             x0);                                           % from x0.
+
+%%
+% For this trivial example, the state is simply the iteration count. We'll
+% increase the count every iteration until the count |>= n| and return the
+% final count. All this does therefore is count from 0 to the input n. Not 
+% very interesting, but it demonstrates the loop.
+
+count = @(n) loop(0, ...            % Initialize state, k, to 0
+                  @(k) k < n, ...   % While k < n
+                  @(k) k + 1);      %   k = k + 1
+
+arrayfun(count, 1:10)
+
+%%
+% Recall from the last part that we can implement multiple statements 
+% inside a cell array and can then return whatever output we need. We'll
+% use that technique here to make our loops have more complex behavior.
+% 
+% In the example below, the state is still the iteration count, but on
+% each iteration, we'll print something out, storing its result (a number)
+% in the first position of a cell array, and we'll add 1 to |k|, storing 
+% the result in the second position. We'll use |curly| to return only the 
+% second position. In this way, on every iteration, we'll print something 
+% and update the counter. Here's the pseudocode.
+%
+%     Set k to 1.
+%     While k <= 4
+%       Print something out.
+%       Store k+1.             <- Return this value as k
+%     End
+%
+% The code then proceeds this way:
+
+pets = {'cat', 'dog', 'bird', 'fish'};
+describe_pet = @(pet) fprintf('I have a %s.\n', pet);
+
+declare_my_pets = @() loop(...              % Loop
+    1, ...                                  % From k = 1
+    @(k) k <= 4, ...                        % While k <= 4
+    @(k) curly({ describe_pet(pets{k}), ... %   Step 1: Print something
+                 k + 1 }, ...               %   Step 2: Add 1 to k
+               2));                         %   Return output from step 2
+
+% Call our anonymous function that loops.
+declare_my_pets();
+
+%%
+% I'll be the first to admit that the loop is a bit longer and much more 
+% rigid than a normal MATLAB loop. On the other hand, it can be used in
+% anonymous functions, and its syntax has a certain cleanliness to it in
+% that it doesn't modify any variables that live outside the loop; it has
+% its own scope. This is one nice feature of |loop| being a _function_ that
+% takes _code_ (functions) as arguments.
+%
+% Consider that the state we're using could be anything, whether a simple 
+% scalar that keeps a count of the number of iterations like those above, a
+% cell array holding multiple values, a structure, or even an object. We'll
+% use and update this state on every iteration. When we're done, the state 
+% is returned. Before we show the use of more complex states though, let's
+% first make a better loop.
+
+%% A Better Loop
+% Let's make handling the state a bit easier. If instead of handing |x|
+% into the functions, we let |x| be a cell array of arguments to those
+% functions, things get a little easier to use. Then, |fcn| must return a
+% cell array of arguments to the next call to |fcn| or |cont|. All we have
+% to do to implement this is append |{:}| to the end of |x| when we use it.
+% The |factorial| example below makes this much clearer.
+%
+% As one final convenience, instead of returning the full state at the
+% very end, we'll add a |cleanup| function to only return the important
+% parts of the state. For instance, the state might contain an iteration 
+% counter, but we don't need this after the loop is done, so the
+% |cleanup| will simply not return this part.
+
+loop = @(x0, cont, fcn, cleanup) ...                            % Header
+       recur(@(f, x) iif(~cont(x{:}), cleanup(x{:}), ...        % Continue?
+                         true,        @() f(f, fcn(x{:}))), ... %   Iterate
+             x0);                                               % from x0.
+
+%%
+% For this implementation of factorial, we'll keep our iteration count,
+% |k|, and the previous products, |x|, in a cell array. According to the
+% change we made above, this means |x| and |k| will be handed to our
+% functions now.
+
+factorial = @(n) loop({1, 1}, ...         % Start with k = 1 and x = 1
+                      @(k,x) k <= n, ...  % While k <= n
+                      @(k,x) {k + 1, ...  %   k = k + 1;
+                              k * x}, ... %   x = k * x;
+                      @(k,x) x);          % End, returning x
+
+% First 7 numbers of the factorial sequence
+arrayfun(factorial, 1:7)
+
+%%
+% As a practical note, recall that because these loops use recursion,
+% there's a limit to the number of times they can loop (MATLAB has a
+% recursion limit, which is a setting in Preferences). Also, a recursive
+% implementation of a loop isn't the most efficient. For this reason, it's
+% best to implement |loop| as a |.m| file that can then be used in the same
+% way.
+% 
+%     function x = loop(x, cont, f, cleanup)
+%         while ~cont(x{:})
+%             x = f(x{:});
+%         end
+%         if nargin == 4
+%             x = cleanup(x{:});
+%         end
+%     end
+         
+%%
+% This brings us to our final example. Below, we'll simulate a simple
+% harmonic oscillator, using a structure to store dissimilar states,
+% including a complete time history of the oscillator.
+
+% First, calculate a state transition matrix that represents a harmonic
+% oscillator with damping.
+Phi = expm(0.5*[0 1; -1 -0.2]);
+
+% Now create the loop.
+x   = loop({[1; 0], 1}, ...                  % Initial state
+           @(x,k) k <= 100, ...              % While k <= 100
+           @(x,k) {[x, Phi * x(:, end)], ... %   Update x
+                   k + 1}, ...               %   Update k
+           @(x,k) x);                        % End, return x
+
+% Create a plot function.
+plot_it = @(n, x, y, t) {subplot(2, 1, n), ...            % Select subplot.
+                         plot(x), ...                     % Plot the data.
+                         iif(nargin==4, @() title(t), ... % If there's a
+                             true,        []), ...        % title, add it.
+                         ylabel(y), ...                   % Label y
+                         xlabel('Time (s)')};             % and x axes.
+
+% Plot the result.
+plot_it(1, x(1, :), 'Position (m)', 'Harmonic Oscillator');
+plot_it(2, x(2, :), 'Velocity (m/s)');
+
+%%
+% That's it for loops via recursion!
+%
+
+%% Summary
+% Let's look back at what we did over these three parts. First, we started
+% with a simple |map| utility function to demonstrate the
+% function-of-functions idea. Then we created our ubiquitous inline if,
+% which further enabled recursion (a conditional is necessary to make
+% recursion stop!). We also showed using multiple statements by storing
+% their outputs in a cell array. Finally, we created a |loop| construct on 
+% top of our recursion functions. Here they are as brief anonymous
+% function.
+
+map   = @(val, fcns) cellfun(@(f) f(val{:}), fcns);
+mapc  = @(val, fcns) cellfun(@(f) f(val{:}), fcns, 'UniformOutput', false);
+iif   = @(varargin) varargin{2*find([varargin{1:2:end}], 1, 'first')}();
+recur = @(f, varargin) f(f, varargin{:});
+paren = @(x, varargin) x(varargin{:});
+curly = @(x, varargin) x{varargin{:}};
+loop  = @(x,c,f,r) recur(@(g,y) iif(~c(y{:}),r(y{:}),1,@()g(g,f(y{:}))),x);
+
+%% 
+% At this point, we've done more than just scratch the surface of 
+% functional programming. We've used MATLAB's interesting constructs, such 
+% as function handles, cell arrays, and |varargin| to implement a 
+% functional programming framework, allowing a new syntax within MATLAB,
+% where code can be arguments to flow control functions.
+%
+% Thanks for reading. I hope this has both enabled a new level of detail in
+% anonymous functions in MATLAB and helped demonstrate the wide range of
+% possibilities available within the MATLAB language.
+%
+% Enjoy!
+%
+% - Tucker McClure
+
+%% Addendum
+% Several additional files are included with the File Exchange submission
+% that weren't included in the blog posts. These include (documentation
+% will appear in the command window):
+%
+% * |dowhile| (<matlab:clc;help('dowhile')>)
+% * |forloop| (<matlab:clc;help('forloop')>)
+% * |last|    (<matlab:clc;help('last')>)
+% * |output|  (<matlab:clc;help('output')>)
+% * |tern|    (<matlab:clc;help('tern')>)
+% * |use|     (<matlab:clc;help('use')>)
+% * |void|    (<matlab:clc;help('void')>)
+% * |wrap|    (<matlab:clc;help('wrap')>)
+%
+% Each contains its own documention and examples.
+
+##### SOURCE END #####
+--></body></html>

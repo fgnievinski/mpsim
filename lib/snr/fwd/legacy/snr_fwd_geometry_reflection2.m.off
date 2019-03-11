@@ -1,0 +1,33 @@
+function [out, sfc] = snr_fwd_geometry_reflection2 (...
+epoch, elev, azim, ...
+fnc_snr_setup_sfc_geometry, ...
+varargin)
+    sfc = snr_setup_sfc ([], [], [], fnc_snr_setup_sfc_geometry, varargin{:});
+    sat = snr_setup_sat_trivial (epoch, elev, azim);
+    ant = [];
+    rec = [];
+    opt = [];
+    
+    if isempty(epoch)
+        out.epoch = [];
+        out.elev = [];
+        out.azim = [];
+        out.dir_reflected = zeros(0,3);
+        out.pos_reflected = zeros(0,3);
+        out.dist = [];
+        return
+    end
+
+    dir_sat.elev = elev;
+    dir_sat.azim = azim;
+
+    [dir_reflected, pos_reflected, dist] = sfc.snr_fwd_geometry_reflection (...
+        dir_sat, sat, sfc, ant, rec, opt);
+
+    out.epoch = epoch;
+    out.elev = dir_sat.elev;
+    out.azim = dir_sat.azim;
+    out.dir_reflected = dir_reflected;
+    out.pos_reflected = pos_reflected;
+    out.dist = dist;
+end

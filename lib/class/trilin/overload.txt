@@ -1,0 +1,16 @@
+This is in case you want your class to support trilin.
+
+It's provided trifactor, trisolve, tricond, tri_mldivide and tri_rcond.
+ 
+- Overload issquare, issym, istriu, istril if your class does not work with the generic ones.
+
+- Overload trifactor_pos, trifactor_sym, trifactor_gen (trifactor_tri is not needed because triangular matrices need not be factorized).
+- Overload trisolve_tri, trisolve_pos, trisolve_sym, trisolve_gen.
+- Overload tricond_tri, tricond_pos, tricond_sym, tricond_gen.
+
+- Overload mldivide, calling the generic tri_mldivide (see mldivide.m.template).
+- Overload rcond, calling the generic tri_rcond (see rcond.m.template).
+- Overload chol, bk, lu, calling the overloaded trifactor_pos, trifactor_sym, trifactor_gen.
+
+- Overload norm.
+

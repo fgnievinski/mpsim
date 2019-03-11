@@ -1,0 +1,5 @@
+- overload subsref
+	A{k} retrieves the k-th frontal panel, i.e., A{k}=A(:,:,k).
+
+- frontal_mtimes_helper: spawn multiple threads, to take advantage of multiple processor cores?
+

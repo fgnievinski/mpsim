@@ -1,0 +1,6 @@
+- make angle the primary prefix, then azimuth is just an interface.
+- use sind/cosd
+- generalize angle_mean/angle_median as angle_avg
+- remove reference to which axis the angle is reckoned from
+    (hint: it doesn't matter as long as sin/cos are consistent with atan)
+

@@ -1,0 +1,507 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Material stratification or layering</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-12-28"><meta name="DC.source" content="snr_demo_layer.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Material stratification or layering</h1><!--introduction--><p>Geophysical media often exhibit stratification or layering; here we show how to produce a forward simulation account for.</p><p>This demo itself is writen in MATLAB; you can see its souce code clicking <a href="../snr_demo_layer.m">here</a>.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">A slab between halfspaces</a></li><li><a href="#6">Few-layer profile</a></li><li><a href="#8">Stacks</a></li><li><a href="#9">Interpolated profile</a></li><li><a href="#11">Parametric profile</a></li></ul></div><h2>A slab between halfspaces<a name="1"></a></h2><p>A slab can be inserted between top and bottom half-spaces. So in addition to <tt>material_top</tt> and <tt>material_bottom</tt>, we introduce <tt>sett.sfc.material_middle</tt>, which has a <tt>thickness</tt> value:</p><pre class="codeinput">sett = snr_settings();
+<span class="comment">% Define first case -- dry soil of infinite thickness:</span>
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = [];
+sett.sfc.material_bottom = <span class="string">'dry soil'</span>;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case -- 1-cm thick dry soil slab on top of metal:</span>
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 1e-2;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.name = <span class="string">'dry soil'</span>;
+sett.sfc.material_bottom = <span class="string">'metal'</span>;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+<span class="comment">%snr_demo_plot_diff (result, result0)</span>
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_01.png" alt=""> <p>Layering can affect the interpretation of the antenna height. When dealing with soil, the middle slab is underground, whereas with snow, the slab is above-ground. So for soil, the reference surface is the top halfspace interface, whereas for snow it is the bottom halfspace interface. We can use <tt>sett.sfc.vert_datum</tt> to define the vertical datum:</p><pre class="codeinput">sett = snr_settings();
+sett.ref.ignore_vec_apc_arp = true;
+<span class="comment">% Define first case -- 10-cm snow slab, on top of dry soil halfspace:</span>
+sett.sfc.vert_datum = <span class="string">'bottom'</span>;
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 0.10;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.name = <span class="string">'dry snow fixed'</span>;
+sett.sfc.material_bottom = <span class="string">'dry soil fixed'</span>;
+  setup0 = snr_setup (sett);
+  result0 = snr_fwd (setup0);
+<span class="comment">% Define second case -- 10-cm wet soil slab, on top of dry soil halfspace:</span>
+sett.sfc.vert_datum = <span class="string">'top'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 0.10;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.name = <span class="string">'wet soil fixed'</span>;
+sett.sfc.material_bottom = <span class="string">'dry soil fixed'</span>;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% This scenario corresponds to case (1) in the cartoon below; compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_02.png" alt=""> <p>Although both <tt>setup</tt> have the same antenna height, the resulting effective height of the antenna above the references surface is different:</p><pre class="codeinput">disp({setup0.sfc.vert_datum, setup0.sfc.height_ant_sfc - setup0.ref.height_ant})
+disp({setup.sfc.vert_datum, setup.sfc.height_ant_sfc - setup.ref.height_ant})
+</pre><pre class="codeoutput">    'bottom'    [-0.1000]
+
+    'top'    [0]
+
+</pre><p>If the bottom half-space is empty, then it will default to the middle slab. Thus the permittivity contrast is lost at the bottom interface, which reverts the scenario back to the case of two half-spaces, with no slab in between -- see case (0) in the cartoon below; this is akin to having a very thick middle slab.</p><pre class="codeinput">sett = snr_settings();
+sett.sfc.vert_datum = <span class="string">'top'</span>;
+<span class="comment">% Define first case -- infinite dry snow medium:</span>
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = [];
+sett.sfc.material_bottom = <span class="string">'dry snow fixed'</span>;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case -- 10-cm thick snow slab, on top of infinite snow:</span>
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 0.1;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.name = <span class="string">'dry snow fixed'</span>;
+sett.sfc.material_bottom = []; <span class="comment">% &lt;&lt;&lt; NOTICE</span>
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+<span class="comment">%snr_demo_plot_diff (result, result0)</span>
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_03.png" alt=""> <p><img vspace="5" hspace="5" src="dia3.png" alt=""> </p><h2>Few-layer profile<a name="6"></a></h2><p>Above we had a single slab; two layers of different materials -- snow and soil -- can be defined as follows (notice that <tt>thickness</tt> now is a vector rather than a scalar):</p><pre class="codeinput">sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = [0.10; 0.10];  <span class="comment">% in meters</span>
+sett.sfc.material_middle.name = {<span class="string">'dry snow fixed'</span>; <span class="string">'dry soil fixed'</span>};
+<span class="comment">% This two-layer middle media still sits on top of a bottom halfspace, soil:</span>
+sett.sfc.material_bottom = <span class="string">'wet soil fixed'</span>;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% This scenario corresponds to case (2) in the cartoon above; compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_04.png" alt=""> <p>We can also have a few layers of the same material type (e.g., soil) but with different material properties, such as moisture (which is now vector- valued, just like thickness):</p><pre class="codeinput">sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = [1; 1; 1]*1e-2;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.moisture = [0.75; 0.5; 0.25];
+sett.sfc.material_middle.name = <span class="string">'soil'</span>;
+sett.sfc.material_middle.type = <span class="string">'sandy loam'</span>;
+sett.sfc.material_bottom = <span class="string">'dry soil fixed'</span>;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_05.png" alt=""> <h2>Stacks<a name="8"></a></h2><p>Diferent material types (e.g., soil and snow) each with varying material properties (e.g., moisture and density) can be achieved forming a stack of two media (e.g. snow on soil).</p><pre class="codeinput">sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_stacked;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = repmat(struct(), [2,1]);
+<span class="comment">% Define the first middle medium -- a 10-cm thick homogeneous slab of snow:</span>
+sett.sfc.material_middle(1).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_middle(1).thickness = 0.1;  <span class="comment">% in meters</span>
+sett.sfc.material_middle(1).name = <span class="string">'dry snow fixed'</span>;
+<span class="comment">% Now define the second middle medium -- three 1-m thick layers of soil,</span>
+<span class="comment">% exhibiting increasing moisture downward:</span>
+sett.sfc.material_middle(2).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_middle(2).thickness = [1; 1; 1]*1e-2;  <span class="comment">% in meters</span>
+sett.sfc.material_middle(2).name = <span class="string">'soil'</span>;
+sett.sfc.material_middle(2).type = <span class="string">'sandy loam'</span>;
+sett.sfc.material_middle(2).moisture = [0.01; 0.02; 0.03];
+<span class="comment">% Finally, the bottom halfspace is taken equal to the bottom-most stack</span>
+<span class="comment">% media, namely, the soil with the most moisture:</span>
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+<span class="comment">% Plot interpolated profile:</span>
+snr_demo_plot_prof (setup)
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_06.png" alt=""> <img vspace="5" hspace="5" src="snr_demo_layer_07.png" alt=""> <h2>Interpolated profile<a name="9"></a></h2><p>Often times we are given a vertical profile made of a few measured properties and we want to interpolate its values at unsampled depths, for example, soil moisture measured at 25-cm depth intervals, with which we will interpolate a 5-mm thick layers up to a maximum depth of 55 cm:</p><pre class="codeinput">sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_interpolated;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.name = <span class="string">'soil'</span>;
+sett.sfc.material_middle.type = <span class="string">'sandy loam'</span>;
+sett.sfc.material_middle.property_name = <span class="string">'moisture'</span>;
+sett.sfc.material_middle.property_sample = [0.75; 0.5; 0.25];
+sett.sfc.material_middle.property_depth = [0; 0.3; 0.5];
+sett.sfc.material_middle.depth_max = 0.55;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.depth_step = 5e-3;  <span class="comment">% in meters</span>
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+<span class="comment">% Plot interpolated profile:</span>
+snr_demo_plot_prof (setup)
+</pre><pre class="codeoutput">Warning: Extrapolating property "moisture" of material "soil". 
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_08.png" alt=""> <img vspace="5" hspace="5" src="snr_demo_layer_09.png" alt=""> <p>An interpolated layer can be stacked just like any other kind:</p><pre class="codeinput">sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_stacked;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = repmat(struct(), [2,1]);
+<span class="comment">% Define the first middle medium -- snow measured at 10-cm depth intervals,</span>
+<span class="comment">% then interpolated at 5-mm thick layers up to 25-cm maximum depth:</span>
+sett.sfc.material_middle(1).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_interpolated;
+sett.sfc.material_middle(1).name = <span class="string">'dry snow'</span>;
+sett.sfc.material_middle(1).property_name = <span class="string">'density'</span>;
+sett.sfc.material_middle(1).property_sample = [0.1; 0.2; 0.3];
+sett.sfc.material_middle(1).property_depth = [0; 0.1; 0.2];
+sett.sfc.material_middle(1).temperature = -5;
+sett.sfc.material_middle(1).depth_max = 0.25;  <span class="comment">% in meters</span>
+sett.sfc.material_middle(1).depth_step = 5e-3;  <span class="comment">% in meters</span>
+<span class="comment">% Now define the second middle medium -- 5-cm thick homogenous layers with</span>
+<span class="comment">% known soil moisture:</span>
+sett.sfc.material_middle(2).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_middle(2).thickness = [1; 1; 1]*5e-2;  <span class="comment">% in meters</span>
+sett.sfc.material_middle(2).name = <span class="string">'soil'</span>;
+sett.sfc.material_middle(2).type = <span class="string">'sandy loam'</span>;
+sett.sfc.material_middle(2).moisture = [0.01; 0.02; 0.03];
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+<span class="comment">% Plot interpolated profile:</span>
+snr_demo_plot_prof (setup)
+</pre><pre class="codeoutput">Warning: Extrapolating property "density" of material "dry snow". 
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_10.png" alt=""> <img vspace="5" hspace="5" src="snr_demo_layer_11.png" alt=""> <h2>Parametric profile<a name="11"></a></h2><p>It is also possible to specify the vertical profile of material properties in terms of a parametric formula:</p><pre class="codeinput">sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_parametric;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.name =  <span class="string">'soil'</span>;
+sett.sfc.material_middle.type =  <span class="string">'sandy loam'</span>;
+<span class="comment">% A new field is used to specify the name of property parameterized:</span>
+sett.sfc.material_middle.property_name = <span class="string">'moisture'</span>;
+<span class="comment">% Another field is a function handle, dependent on both depth and arbitrary</span>
+<span class="comment">% parameters -- in this case, polynomial coefficients:</span>
+sett.sfc.material_middle.fnc_property = @(depth, param) <span class="keyword">...</span>
+  param(1) + param(2) .* depth + param(3) .* depth.^2;
+<span class="comment">% The parameter values are specified it their own field:</span>
+sett.sfc.material_middle.property_param = [0.1, 0.2, +0.3];
+sett.sfc.material_middle.depth_max = 0.25;  <span class="comment">% in meters</span>
+sett.sfc.material_middle.depth_step = 5e-3;  <span class="comment">% in meters</span>
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+<span class="comment">% Plot interpolated profile:</span>
+snr_demo_plot_prof (setup)
+</pre><img vspace="5" hspace="5" src="snr_demo_layer_12.png" alt=""> <img vspace="5" hspace="5" src="snr_demo_layer_13.png" alt=""> <p>In summary, the definition of material stratification can involve any or all of the following:</p><div><ol><li><tt>snr_setup_sfc_material_halfspaces</tt></li><li><tt>snr_setup_sfc_material_slab</tt></li><li><tt>snr_setup_sfc_material_layered</tt></li><li><tt>snr_setup_sfc_material_stacked</tt></li><li><tt>snr_setup_sfc_material_interpolated</tt></li><li><tt>snr_setup_sfc_material_parametric</tt></li></ol></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Material stratification or layering
+% Geophysical media often exhibit stratification or layering; here we show
+% how to produce a forward simulation account for.
+% 
+% This demo itself is writen in MATLAB; you can see its souce code clicking
+% <../snr_demo_layer.m here>.
+
+%% A slab between halfspaces
+% A slab can be inserted between top and bottom half-spaces. So in addition
+% to |material_top| and |material_bottom|, we introduce
+% |sett.sfc.material_middle|, which has a |thickness| value:
+sett = snr_settings();
+% Define first case REPLACE_WITH_DASH_DASH dry soil of infinite thickness:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = [];
+sett.sfc.material_bottom = 'dry soil';
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case REPLACE_WITH_DASH_DASH 1-cm thick dry soil slab on top of metal:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 1e-2;  % in meters
+sett.sfc.material_middle.name = 'dry soil';
+sett.sfc.material_bottom = 'metal';
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%snr_demo_plot_diff (result, result0)
+
+%%
+% Layering can affect the interpretation of the antenna height. When
+% dealing with soil, the middle slab is underground, whereas with snow, the
+% slab is above-ground. So for soil, the reference surface is the top
+% halfspace interface, whereas for snow it is the bottom halfspace
+% interface. We can use |sett.sfc.vert_datum| to define the vertical datum:
+sett = snr_settings();
+sett.ref.ignore_vec_apc_arp = true;
+% Define first case REPLACE_WITH_DASH_DASH 10-cm snow slab, on top of dry soil halfspace: 
+sett.sfc.vert_datum = 'bottom';
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 0.10;  % in meters
+sett.sfc.material_middle.name = 'dry snow fixed';
+sett.sfc.material_bottom = 'dry soil fixed';
+  setup0 = snr_setup (sett);
+  result0 = snr_fwd (setup0);
+% Define second case REPLACE_WITH_DASH_DASH 10-cm wet soil slab, on top of dry soil halfspace:
+sett.sfc.vert_datum = 'top';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 0.10;  % in meters
+sett.sfc.material_middle.name = 'wet soil fixed';
+sett.sfc.material_bottom = 'dry soil fixed';
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% This scenario corresponds to case (1) in the cartoon below; compare:
+snr_demo_plot2 (result, result0)
+
+%% 
+% Although both |setup| have the same antenna height, the resulting
+% effective height of the antenna above the references surface is
+% different:
+disp({setup0.sfc.vert_datum, setup0.sfc.height_ant_sfc - setup0.ref.height_ant})
+disp({setup.sfc.vert_datum, setup.sfc.height_ant_sfc - setup.ref.height_ant})
+
+%% 
+% If the bottom half-space is empty, then it will default to the middle
+% slab. Thus the permittivity contrast is lost at the bottom interface,
+% which reverts the scenario back to the case of two half-spaces, with no
+% slab in between REPLACE_WITH_DASH_DASH see case (0) in the cartoon below; this is akin to
+% having a very thick middle slab.
+sett = snr_settings();
+sett.sfc.vert_datum = 'top';
+% Define first case REPLACE_WITH_DASH_DASH infinite dry snow medium:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = [];
+sett.sfc.material_bottom = 'dry snow fixed';
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case REPLACE_WITH_DASH_DASH 10-cm thick snow slab, on top of infinite snow:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = 0.1;  % in meters
+sett.sfc.material_middle.name = 'dry snow fixed';
+sett.sfc.material_bottom = []; % <<< NOTICE
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%snr_demo_plot_diff (result, result0)
+
+%%
+% 
+% <<dia3.png>>
+% 
+%% Few-layer profile
+% Above we had a single slab; two layers of different materials REPLACE_WITH_DASH_DASH snow and
+% soil REPLACE_WITH_DASH_DASH can be defined as follows (notice that |thickness| now is a
+% vector rather than a scalar):
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = [0.10; 0.10];  % in meters
+sett.sfc.material_middle.name = {'dry snow fixed'; 'dry soil fixed'};
+% This two-layer middle media still sits on top of a bottom halfspace, soil:
+sett.sfc.material_bottom = 'wet soil fixed';
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% This scenario corresponds to case (2) in the cartoon above; compare:
+snr_demo_plot2 (result, result0)
+
+%% 
+% We can also have a few layers of the same material type (e.g., soil) but
+% with different material properties, such as moisture (which is now vector-
+% valued, just like thickness):
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.thickness = [1; 1; 1]*1e-2;  % in meters
+sett.sfc.material_middle.moisture = [0.75; 0.5; 0.25];
+sett.sfc.material_middle.name = 'soil';
+sett.sfc.material_middle.type = 'sandy loam';
+sett.sfc.material_bottom = 'dry soil fixed';
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+
+%% Stacks
+% Diferent material types (e.g., soil and snow) each with varying material
+% properties (e.g., moisture and density) can be achieved forming a stack 
+% of two media (e.g. snow on soil).
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_stacked;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = repmat(struct(), [2,1]);
+% Define the first middle medium REPLACE_WITH_DASH_DASH a 10-cm thick homogeneous slab of snow:
+sett.sfc.material_middle(1).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_slab;
+sett.sfc.material_middle(1).thickness = 0.1;  % in meters
+sett.sfc.material_middle(1).name = 'dry snow fixed';
+% Now define the second middle medium REPLACE_WITH_DASH_DASH three 1-m thick layers of soil,
+% exhibiting increasing moisture downward:
+sett.sfc.material_middle(2).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_middle(2).thickness = [1; 1; 1]*1e-2;  % in meters
+sett.sfc.material_middle(2).name = 'soil';
+sett.sfc.material_middle(2).type = 'sandy loam';
+sett.sfc.material_middle(2).moisture = [0.01; 0.02; 0.03];
+% Finally, the bottom halfspace is taken equal to the bottom-most stack
+% media, namely, the soil with the most moisture:
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+% Plot interpolated profile:
+snr_demo_plot_prof (setup)
+
+%% Interpolated profile
+% Often times we are given a vertical profile made of a few measured
+% properties and we want to interpolate its values at unsampled depths, for
+% example, soil moisture measured at 25-cm depth intervals, with which we
+% will interpolate a 5-mm thick layers up to a maximum depth of 55 cm:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_interpolated;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.name = 'soil';
+sett.sfc.material_middle.type = 'sandy loam';
+sett.sfc.material_middle.property_name = 'moisture';
+sett.sfc.material_middle.property_sample = [0.75; 0.5; 0.25];
+sett.sfc.material_middle.property_depth = [0; 0.3; 0.5];
+sett.sfc.material_middle.depth_max = 0.55;  % in meters
+sett.sfc.material_middle.depth_step = 5e-3;  % in meters
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+% Plot interpolated profile:
+snr_demo_plot_prof (setup)
+
+%% 
+% An interpolated layer can be stacked just like any other kind:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_stacked;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = repmat(struct(), [2,1]);
+% Define the first middle medium REPLACE_WITH_DASH_DASH snow measured at 10-cm depth intervals,
+% then interpolated at 5-mm thick layers up to 25-cm maximum depth:
+sett.sfc.material_middle(1).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_interpolated;
+sett.sfc.material_middle(1).name = 'dry snow';
+sett.sfc.material_middle(1).property_name = 'density';
+sett.sfc.material_middle(1).property_sample = [0.1; 0.2; 0.3];
+sett.sfc.material_middle(1).property_depth = [0; 0.1; 0.2];
+sett.sfc.material_middle(1).temperature = -5;
+sett.sfc.material_middle(1).depth_max = 0.25;  % in meters
+sett.sfc.material_middle(1).depth_step = 5e-3;  % in meters
+% Now define the second middle medium REPLACE_WITH_DASH_DASH 5-cm thick homogenous layers with
+% known soil moisture:
+sett.sfc.material_middle(2).fnc_snr_setup_sfc_material = @snr_setup_sfc_material_layered;
+sett.sfc.material_middle(2).thickness = [1; 1; 1]*5e-2;  % in meters
+sett.sfc.material_middle(2).name = 'soil';
+sett.sfc.material_middle(2).type = 'sandy loam';
+sett.sfc.material_middle(2).moisture = [0.01; 0.02; 0.03];
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+% Plot interpolated profile:
+snr_demo_plot_prof (setup)
+
+%% Parametric profile
+% It is also possible to specify the vertical profile of material
+% properties in terms of a parametric formula:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_parametric;
+sett.sfc.material_top = 'air';
+sett.sfc.material_middle = struct();
+sett.sfc.material_middle.name =  'soil';
+sett.sfc.material_middle.type =  'sandy loam';
+% A new field is used to specify the name of property parameterized:
+sett.sfc.material_middle.property_name = 'moisture';
+% Another field is a function handle, dependent on both depth and arbitrary
+% parameters REPLACE_WITH_DASH_DASH in this case, polynomial coefficients:
+sett.sfc.material_middle.fnc_property = @(depth, param) ...
+  param(1) + param(2) .* depth + param(3) .* depth.^2;
+% The parameter values are specified it their own field:
+sett.sfc.material_middle.property_param = [0.1, 0.2, +0.3];
+sett.sfc.material_middle.depth_max = 0.25;  % in meters
+sett.sfc.material_middle.depth_step = 5e-3;  % in meters
+sett.sfc.material_bottom = [];
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+% Plot interpolated profile:
+snr_demo_plot_prof (setup)
+
+%%
+% In summary, the definition of material stratification can involve any or
+% all of the following:
+% 
+% # |snr_setup_sfc_material_halfspaces|
+% # |snr_setup_sfc_material_slab|
+% # |snr_setup_sfc_material_layered|
+% # |snr_setup_sfc_material_stacked|
+% # |snr_setup_sfc_material_interpolated|
+% # |snr_setup_sfc_material_parametric|
+% 
+
+##### SOURCE END #####
+--></body></html>

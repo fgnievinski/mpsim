@@ -1,0 +1,26 @@
+function geopot = get_geopot2 (pos_local, varargin)
+    persistent type pos_geod0 ell coeff n_max
+    if (nargin > 1),  type      = varargin{1};  end
+    if (nargin > 2),  pos_geod0 = varargin{2};  end
+    if (nargin > 3),  ell       = varargin{3};  end
+    if (nargin > 4),  coeff     = varargin{4};  end
+    if (nargin > 5),  n_max     = varargin{5};  end
+    %disp(type)  % DEBUG
+    
+    pos_cart = convert_from_local_cart(pos_local, pos_geod0, ell);
+    pos_sph = convert_to_spherical(pos_cart);
+    
+    %disp(pos_cart)
+    get_geopot_normal_which = @get_geopot_normal_series;
+    %get_geopot_normal_which = @get_geopot_normal_trunc;
+    %get_geopot_normal_which = @get_geopot_normal;
+    switch lower(type)
+    case 'actual'
+        geopot = get_geopot (pos_sph, ell, coeff, n_max);
+    case 'normal'
+        geopot = get_geopot_normal_which (pos_sph, ell);
+    case 'spherical'
+        geopot = get_geopot_sph (pos_sph, ell, true, true);
+    end
+end
+

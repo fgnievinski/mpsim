@@ -1,0 +1,13 @@
+function out = defrontal_pt2 (in)
+    [m,n,p] = size(in);
+    assert(n==1);
+    out = reshape(in, [m, p, 1]);
+end
+
+%!test
+%! in = cat(3, [1; 4], [2; 5], [3; 6]);
+%! out = [1 2 3; 4 5 6];
+%! out2 = defrontal_pt2(in);
+%! %out, out2  % DEBUG
+%! assert(out, out2);
+

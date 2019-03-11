@@ -1,0 +1,5 @@
+% (this is just an interface)
+function varargout = snr_fwd_fringe_visib_raw (varargin)
+    [varargout{1:nargout}] = get_fringe_visib_raw (varargin{:});
+end
+

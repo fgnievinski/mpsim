@@ -1,0 +1,18 @@
+function [s, c] = frontal_cov2corr (C)
+  d = frontal_diag(cov);
+  s = sqrt(d);
+  if (nargout < 2),  return;  end
+  S = frontal_mtimes(s, frontal_transpose(s));
+  c = C./S;
+end
+
+%!test
+%! C = rand(3,3,10);
+%! s = [];
+%! c = [];
+%! for k=1:size(C,3)
+%!    [s(:,:,k), c(:,:,k)] = cov2corr(C(:,:,k));
+%! end
+%! [s, c] = frontal_cov2corr (C)
+
+

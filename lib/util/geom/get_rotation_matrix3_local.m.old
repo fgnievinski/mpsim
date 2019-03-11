@@ -1,0 +1,91 @@
+function [rot, dir_nrml, dir_grad] = get_rotation_matrix3_local (slope, aspect, axial)
+    if (nargin < 3),  axial = 0;  end
+    if ~isscalar(slope) || ~isscalar(aspect) || ~isscalar(axial)
+        error('matlab:get_rotation_matrix3_local:nonScalar', ...
+            'Multiple points not supported.');
+    end
+    if (nargout < 2) && (slope == 0) && (aspect == 0) && (axial == 0)
+        rot = eye(3);
+        return;
+    end
+    persistent rot0 dir_nrm0 dir_grad0 slope0 aspect0 axial0
+    if ~isempty(rot0) && (slope == slope0) && (aspect == aspect0) && (axial == axial0)
+        rot = rot0;
+        dir_nrml = dir_nrm0;
+        dir_grad = dir_grad0;
+        return;
+    end
+    [rot, dir_nrml, dir_grad] = get_rotation_matrix3_aux (slope, aspect, axial);
+    slope0 = slope;
+    aspect0 = aspect;
+    axial0 = axial;
+    rot0 = rot;
+    dir_nrm0 = dir_nrml;
+    dir_grad0 = dir_grad;
+end
+
+function [rot, dir_nrml, dir_grad] = get_rotation_matrix3_aux (slope, aspect, axial)
+    dir_up_cart = [0 0 1];
+    
+    %dir_desc.elev = slope;  % WRONG!
+    dir_desc.elev = -slope;
+    dir_desc.azim = aspect;
+    if ~isa(slope, 'sym'),  dir_desc.azim = mod(dir_desc.azim, 360);  end
+    dir_desc.sph = [dir_desc.elev, dir_desc.azim, 1];
+    dir_desc.cart = sph2cart_local(dir_desc.sph);
+    dir_grad.cart = -dir_desc.cart;
+    dir_grad.sph  = cart2sph_local(dir_grad.cart);
+    %dir_grad.cart = sph2cart_local(dir_grad.sph);
+    
+    %dir_nrml.cart = cross(normalize_vec(cross(dir_grad.cart, dir_up_cart)), dir_grad.cart);  % WRONG!
+    dir_nrml.cart = cross_local(normalize_vec(cross_local(dir_grad.cart, dir_up_cart)), dir_grad.cart);
+    dir_nrml.sph = cart2sph_local(dir_nrml.cart);
+    dir_nrml.elev = dir_nrml.sph(:,1);
+    dir_nrml.azim = dir_nrml.sph(:,2);
+
+    %rotb = get_rotation_matrix2_local(dir_up_cart, dir_nrml.cart);  % WRONG!
+    rotb = get_rotation_matrix5_local (dir_nrml);
+    
+    %rota = get_rotation_matrix(3, -axial);  % WRONG!
+    rota = get_rotation_matrix_local(3, -axial);
+
+    %rot = rotb * rota;  % WRONG!
+    rot = rota * rotb;  % axial rotation last.
+end      
+
+%!test
+%! rand('seed',0)
+%! slope  = randint(0, 90);
+%! aspect = randint(0, 360);
+%! axial  = 0;
+%! 
+%! [rot, dir_nrml, dir_grad] = get_rotation_matrix3_local (slope, aspect, axial);
+%! 
+%! % now obtain all the same results via alternative formulations:
+%! dir_grad2.elev = slope;
+%! dir_grad2.azim = aspect + 180;
+%! dir_grad2.azim = azimuth_range_positive(dir_grad2.azim);
+%! dir_grad2.sph = [dir_grad2.elev, dir_grad2.azim, 1];
+%! dir_grad2.cart = sph2cart_local(dir_grad2.sph);
+%! 
+%! temp = get_rotation_matrix(3, -dir_grad2.azim) ...
+%!      * get_rotation_matrix(2, 90) ...
+%!      * get_rotation_matrix(3,  dir_grad2.azim);
+%! %temp = get_rot_neu2xyz2neu(temp);  % unnecessary.
+%! dir_nrml2.cart = (temp * dir_grad.cart.').';
+%! 
+%! rot2 = NaN(3,3);
+%! %assert(axial == 0)
+%! dir_up_cart = [0 0 1];
+%! dir_nrml3.cart = (rot * dir_up_cart.').';
+%! 
+%!   %slope, aspect, axial  % DEBUG
+%!   %[dir_grad.sph; dir_grad2.sph; dir_grad2.sph - dir_grad.sph]  % DEBUG
+%!   %[dir_nrml.cart; dir_nrml2.cart; dir_nrml2.cart - dir_nrml.cart]  % DEBUG
+%!   %[dir_nrml.cart; dir_nrml3.cart; dir_nrml3.cart - dir_nrml.cart]  % DEBUG
+%!   %[rot, rot2, rot2-rot]  % DEBUG
+%! 
+%! myassert(dir_grad2.sph, dir_grad.sph, -sqrt(eps()));
+%! myassert(dir_nrml2.cart, dir_nrml.cart, -10*eps());
+%! %myassert(rot2, rot, -sqrt(eps()));
+

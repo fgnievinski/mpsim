@@ -1,0 +1,6 @@
+function answer = tau_inv (x, dof)
+% I'm not  sure how to calculate the inverse PDF of the tau distribution. It seems that the expression that I'm using should be used to calculate the tau PDF itself, not its inverse.
+    temp = tinv(x, dof-1);
+    answer = ( sqrt(dof) / sqrt((dof-1) * temp.^2) ) * temp;
+end
+

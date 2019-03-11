@@ -1,0 +1,19 @@
+function [var, trend, den] = get_multipath_modulation (...
+phasor_direct, phasor_reflected, ...
+detrendit_all, normalizeit_all, phasor_reflected2, ...
+detrendit_again, normalizeit_again, elev, degree, p)
+    if (nargin < 3),  detrendit_all = [];  end
+    if (nargin < 4),  normalizeit_all = [];  end
+    if (nargin < 5),  phasor_reflected2 = [];  end
+    if (nargin < 6),  detrendit_again = [];  end
+    if (nargin < 7),  normalizeit_again = [];  end
+    if (nargin < 8),  elev = [];  end
+    if (nargin < 9),  degree = [];  end
+    if (nargin <10),  p = [];  end
+    composite_pow = get_power(phasor_direct + phasor_reflected);
+    [var, trend, den] = get_multipath_modulation_aux (composite_pow, ...
+        phasor_direct, phasor_reflected, ...
+        detrendit_all, normalizeit_all, phasor_reflected2, ...
+        detrendit_again, normalizeit_again, elev, degree, p);
+end
+

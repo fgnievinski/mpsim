@@ -1,0 +1,38 @@
+function [pre2, pre, info] = snr_po_delay2 (sat, sfc, ant, rec, opt, pre)
+    [pre, info] = snr_po_pre (sat, sfc, ant, rec, opt, pre);
+    pre2 = pre;  % pre cannot be modified, pre2 can.
+    
+    %% Receiver-satellite vector:
+    pre2.dir_sat_direct = sph2cart_local([opt.elev_sat_direct, opt.azim_sat_direct, 1]);
+    
+    %% Propagation delay:
+    [ignore, more] = snr_po_delay (pre2.pos_sfc, opt.ref.pos_ant, ...
+        pre2.dir_sat_direct, opt.dist_sat_direct, ...
+        pre2.dist_scatt); %#ok<ASGLU>
+    pre2 = structmerge(pre2, more);
+
+    %% Numerical stationary phase method.
+    %opt.plotit = true;  % DEBUG
+    info.truncation_factor = 1;
+    if (opt.num_specular_max > 0)
+        [pos_specular, idx_keep] = snr_po_spm (...
+            snr_po_mapform(pre2.delay), info.x_domain, info.y_domain, opt.wavelength, ...
+            opt.num_specular_max, opt.fresnel_zone_keep); %#ok<ASGLU>
+        clear pos_specular
+        % Now keep only the elements within the n-th Fresnel zone:
+        pre2 = structfun(@(f) mygetel(f, idx_keep), pre2, 'UniformOutput',false);
+        snr_po_mapform ([], [], idx_keep);
+        info.truncation_factor = fresnel2factor (opt.fresnel_zone_keep);
+        info.num_elements_original = info.num_elements;
+        info.num_elements = sum(sum(idx_keep));
+    end
+    function out = mygetel (in, idx)
+        if isempty(in) || (size(in,1) == 1),  out = in;  return;  end
+        out = in(idx,:);
+        %if isempty(in) || isscalar(in),  out = in;  return;  end  % WRONG!
+        %out = in(idx);  % WRONG!
+    end
+
+
+end
+

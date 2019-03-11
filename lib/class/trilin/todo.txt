@@ -1,0 +1,7 @@
+Future work:
+- support user-defined transpose flag in trisolve.
+- rewrite sparse_tricond_{pos,gen} employing the factorizations, not the original matrix.
+- trifactor_nonsq: xGEQRF
+- trisolve_nonsq: xORMQR followed by xTRTRS
+- ? tri_linsolve, to be called by an overloaded linsolve
+

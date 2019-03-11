@@ -1,0 +1,23 @@
+function answer = isherm (A)
+    error(nargchk(1, 1, nargin, 'struct'));
+    error(nargoutchk(0, 1, nargout, 'struct'));
+
+    % degenerate shape:
+    if ( isempty(A) | isscalar(A) | ~issquare(A) )
+        answer = false;
+        return;
+    end
+    
+    % not hermitian?
+    if ~isequal(A, A')
+        answer = false;
+        return;
+    end
+
+    answer = true;
+end
+
+%!test
+%! % isherm ()
+%! do_test_blank_diag_tri_sym;
+

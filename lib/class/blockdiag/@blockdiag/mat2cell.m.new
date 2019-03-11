@@ -1,0 +1,16 @@
+function B = mat2cell (A, m, n)
+    error(nargchk(3, 3, nargin, 'struct'));
+    [I,J] = sizes(A);
+    i = diag(I);  j = diag(J);
+    if (m ~= i) || (n ~= j)
+        error('blockdiag:mat2cell:badSize', 'Case not supported.');
+    end
+    repmat(i, 1, length(i))
+    cellfun(sparse(i,j), I, J, 'UniformOutput',false);
+
+    B = 
+    B = cell(A);
+    struct(A)
+    keyboard
+end
+

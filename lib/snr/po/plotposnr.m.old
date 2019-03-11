@@ -1,0 +1,76 @@
+function plotposnr (answers, elev, fz, p, detrendit, normalizeit, differentiateit)
+  if (nargin < 3) || isempty(fz),  fz = 0:1:10;  end
+  if (nargin < 4) || isempty(p),  p = 2;  end
+  if (nargin < 5) || isempty(detrendit),  detrendit = true;  end
+  if (nargin < 6) || isempty(normalizeit),  normalizeit = true;  end
+  if (nargin < 7) || isempty(differentiateit),  differentiateit = false;  end
+
+  speedup = issorted(fz) && all(arrayfun(...
+      @(answer) all(isfield(answer.map, {'ind_delay','fresnel_zone_sort'})), answers, 'UniformOutput',true));
+  %speedup = false;  % DEBUG
+  speedup
+  if speedup, for i=1:numel(answers) %#ok<ALIGN>
+    idx = (answers(i).map.fresnel_zone_sort < fz(1)) ...
+        | (answers(i).map.fresnel_zone_sort > fz(end));
+    idx(find(answers(i).map.fresnel_zone_sort < fz(1),   1, 'first')) = false;
+    idx(find(answers(i).map.fresnel_zone_sort > fz(end), 1, 'first')) = false;
+    answers(i).map.ind_delay(idx) = [];
+    answers(i).map.fresnel_zone_sort(idx) = [];
+  end, end
+  
+  data = NaN(numel(answers), numel(fz));
+  for i=1:numel(answers)
+  for j=1:numel(fz)
+    if speedup
+      %k_sort = find(answers(i).map.fresnel_zone_sort > fz(j), 1, 'first');
+      k_sort = argmin(abs( answers(i).map.fresnel_zone_sort(:) - fz(j) ));
+      k = answers(i).map.ind_delay(k_sort);
+      %answers(i).map.fresnel_zone_sort(1:k_sort-1) = [];
+      %answers(i).map.ind_delay(1:k_sort-1) = [];      
+    else
+      k = argmin(abs( answers(i).map.fresnel_zone(:) - fz(j) ));
+    end    
+    data(i,j) = get_power( answers(i).direct.phasor + answers(i).map.cphasor(k) );
+    if detrendit
+      data(i,j) = data(i,j) - get_power(answers(i).direct.phasor) - get_power(answers(i).map.cphasor(k));
+    end
+    if normalizeit
+      data(i,j) = data(i,j) ./ get_power(answers(i).direct.phasor);
+    end
+    if (p ~= 2)
+      data(i,j) = sign(data(i,j)).*abs(data(i,j)).^(p/2);
+    end
+  end
+  end
+
+%   if differentiateit
+%     for j=numel(fz):-1:1
+%     c = [1 1 1]*(0.9-0.6*j/numel(fz));
+%     h(j) = plot(elev, temp(:,j), '-', 'Color',c, 'LineWidth',3);
+%     end
+%   end
+  
+  figure
+  hold on
+  %for j=1:numel(fz)
+  for j=numel(fz):-1:1
+    c = [1 1 1]*(0.9-0.6*j/numel(fz));
+    h(j) = plot(elev, data(:,j), '-', 'Color',c, 'LineWidth',3);
+  end
+  if detrendit && normalizeit
+    hline(0, 'k')
+  end
+  grid on
+  xlabel('Elevation angle (degrees)')
+  lab = 'Composite power (W), detrended, normalized';
+  if (p ~= 2),  lab = strrep(lab, 'power (W)', 'magnitude (V)');  end
+  if ~detrendit,  lab = strrep(lab, ', detrended', '');  end
+  if ~normalizeit,  lab = strrep(lab, ', normalized', '');  end
+  ylabel(lab)
+  
+  temp = num2str(reshape(fz,[],1), '%.1f');
+  h=legend(h, temp, 'Location','NorthEast');
+  legendtitle(h, 'Fresnel zone #')
+  
+  maximize()
+end

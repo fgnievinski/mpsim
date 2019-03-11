@@ -1,0 +1,21 @@
+function A = trilin (A, opt)
+    A = class(struct('data',[], 'opt',[]), 'trilin');
+    A.data = A;
+    A.opt = opt;
+end
+
+function C = mtimes (A, B)
+    if istrilin(A),  A = full (A);  end
+    if istrilin(B),  B = full (B);  end
+    C = A * B;
+    % TODO: implement BLAS's {D,S}{TR,SY,PO,GE}MM (e.g. DTRMM) to avoid full().
+end
+
+function A = full (A)
+    A = trifull (A.data, A.opt);
+end
+
+function X = trilin (B, Q)
+    X = trisolve (B, Q.data, Q.opt);
+end
+

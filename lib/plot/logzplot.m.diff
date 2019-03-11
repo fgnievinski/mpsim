@@ -1,0 +1,53 @@
+1c1
+< function h = logzplot(varargin)
+---
+> function [h,h2] = logzplot(varargin)
+283c283
+< plotFunList = {'surf','pcolor','mesh','trisurf','trimesh'};
+---
+> plotFunList = {'surf','pcolor','mesh','trisurf','trimesh','image'};
+349c349
+<         case {'surf','mesh','pcolor'}
+---
+>         case {'surf','mesh','pcolor','image'}
+453a454,456
+>         case 'image'
+>             CDataName = 'CData';
+>             pcolorFlag = 1;  % avoid setting ZScale.
+485a489,498
+>         case 'image'
+>             CDataName = 'CData';
+>             pcolorFlag = 1;  % avoid setting ZScale.
+>             if isvector(x),  x2 = x;  else  x2 = x(1,:);  end
+>             if isvector(y),  y2 = y;  else  y2 = y(:,1);  end
+>             hAx2 = gca();
+>             axes(hAx) %#ok<MAXES>
+>             hSurf = plotFun(x2,y2,CData);
+>             axes(hAx2) %#ok<MAXES>
+>             set(hAx, 'YDir','normal')
+537a551
+> hCbar = [];
+539c553
+<     LogZPlotColorbar(hFig,hAx)
+---
+>     hCbar = LogZPlotColorbar(hFig,hAx);
+567c581
+< if nargout == 1
+---
+> if nargout > 0
+569a584,586
+> if nargout > 1
+>     h2 = hCbar;
+> end
+683c700
+<         case {'surface','patch'}
+---
+>         case {'surface','patch','image'}
+702c719
+<         hSurf = findobj(hAx,'Type','surface','-or','Type','patch');
+---
+>         hSurf = findobj(hAx,'Type','surface','-or','Type','patch','-or','Type','image');
+725c742
+< function LogZPlotColorbar(hFig,hAx,hCbar)
+---
+> function hCbar = LogZPlotColorbar(hFig,hAx,hCbar)

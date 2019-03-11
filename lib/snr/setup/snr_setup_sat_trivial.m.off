@@ -1,0 +1,25 @@
+function sat = snr_setup_sat_trivial (epoch, azim, elev)
+    n = numel(elev);
+    if isempty(epoch),  epoch = (1:n)';  end
+    if isscalar(azim),  azim = repmat(azim, [n,1]);  end
+    if (numel(epoch) ~= n)
+        warning('snr:snr_setup_sat_trivial:badEpoch', ...
+            'Incompatible epoch vector; ignoring it.');
+        epoch = (1:n)';
+    end
+    sat = struct();
+    sat.epoch = epoch;
+    sat.elev  = elev;
+    sat.azim  = azim;
+    sat.get_direction = @get_direction_trivial;
+end
+
+function dir = get_direction_trivial (setup)
+    sat = setup.sat;
+    n = numel(sat.epoch);
+    assert(numel(sat.elev) == n)
+    assert(numel(sat.azim) == n)
+    dir.elev = sat.elev;
+    dir.azim = sat.azim;
+end
+

@@ -1,0 +1,2 @@
+- remove A.size?
+- store only diagonal instead of diagonal plus empty off-diagonal elements?

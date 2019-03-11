@@ -1,0 +1,5 @@
+134a135,138
+>    if (nrhs < 4) Y_default = mxCreateDoubleScalar(mxGetNaN());
+>    if (!mxIsDouble(X_data) || !mxIsDouble(Y_data) \
+>        || !mxIsDouble(X_interp) || !mxIsDouble(Y_default))
+>       mexErrMsgIdAndTxt("lininterp1f:nonDouble", "Input class must double.");

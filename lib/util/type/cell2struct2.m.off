@@ -1,0 +1,22 @@
+function s = cell2struct2 (c, f)
+    assert(iscell(c))
+    assert(iscell(f))
+    assert(all(cellfun(@ischar, f)))
+    assert(length(c) == length(f))
+    for i=1:length(f)
+        s.(f{i}) = c{i};
+    end
+end
+
+%!test
+%! c = {[1,2], {'x','y'}};
+%! f = {'a','b'};
+%! %s = struct('a',[1,2], 'b',{'x','y'});
+%! s.a = [1,2]
+%! s.b = {'x','y'};
+%! s2 = cell2struct2(c, f);
+%! s3 = cell2struct(c, f, 2);
+%! s, s2, s3  % DEBUG
+%! assert( isequal(s2, s))
+%! assert(~isequal(s3, s))
+

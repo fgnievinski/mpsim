@@ -1,0 +1,13 @@
+octave related:
+
+ge_imagesc gebruikt ind2rgb() en dat werkt in octave niet goed.
+
+ge_output zippen werkt niet goed in octave.
+
+ge_kml.html ontbreekt
+
+ge_kmz.html ontbreekt
+
+ge_kmz relative paths werkt niet goed in octave. 
+
+ge_kmz zippen werkt niet goed in octave.

@@ -1,0 +1,773 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>A GNSS multipath simulator for near-surface reflectometry and positioning applications.</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-12-28"><meta name="DC.source" content="snr_demo.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>A GNSS multipath simulator for near-surface reflectometry and positioning applications.</h1><!--introduction--><p>The routines demonstrated here provide model counterparts to actual SNR observations. They require <i>a priori</i> information about the parameters affecting the amount of attenuation as well as group and phase delay exhibited by reflected signals, compared to the direct or line-of-sight signal. These parameters describe:</p><div><ol><li>the properties of target surface (geometry &amp; composition),</li><li>the measurement system characteristics (PRN modulation, receiver tracking algorithms, antenna radiation patterns), and</li><li>the monitoring setup (the height of the antenna above the surface, as well as its orientation).</li></ol></div><p>This demo itself is writen in MATLAB; you can see its souce code clicking <a href="../snr_demo.m">here</a>.  We assume that the search path has already been modified as appropriate for your installation; otherwise, please search for <tt>do_addpath.m</tt>.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Defaults</a></li><li><a href="#4">Forward model run</a></li><li><a href="#6">Forward model setup</a></li><li><a href="#8">Forward model settings</a></li><li><a href="#10">General options</a></li><li><a href="#12">Reference system</a></li><li><a href="#14">Antenna orientation</a></li><li><a href="#16">Antenna model</a></li><li><a href="#20">Surface tilting</a></li><li><a href="#22">Surface undulations</a></li><li><a href="#23">Surface roughness</a></li><li><a href="#25">Material composition</a></li><li><a href="#28">Material stratification/layering</a></li><li><a href="#29">Satellite</a></li><li><a href="#33">Carrier-phase and pseudorange multipath errors</a></li></ul></div><h2>Defaults<a name="1"></a></h2><p>A quick run can be performed using default settings in a single step:</p><pre class="codeinput">snr_fwd();
+</pre><img vspace="5" hspace="5" src="snr_demo_01.png" alt=""> <p>Default settings can be accessed in three easy steps:</p><pre class="codeinput">sett = snr_settings();
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+</pre><p>Now we will give an overview of each of the three previous steps. Later we will illustrate the most common modifications to the defaults.</p><p>We will save the default results for comparison, and will use an auxiliary plotting routine, <tt>snr_demo_plot2</tt>.</p><pre class="codeinput">sett0 = sett;
+result0 = result;
+</pre><h2>Forward model run<a name="4"></a></h2><p>Routine <tt>snr_fwd</tt> outputs a return variable containing the the model equivalent to SNR observations along with other observables:</p><pre class="codeinput">result = snr_fwd (setup);
+</pre><p>Its input argument is obtained as output from routine <tt>snr_setup</tt>, described next.</p><h2>Forward model setup<a name="6"></a></h2><pre class="codeinput">setup = snr_setup (sett);
+  disp(setup)
+</pre><pre class="codeoutput">     sat: [1x1 struct]
+     sfc: [1x1 struct]
+     ref: [1x1 struct]
+     ant: [1x1 struct]
+     opt: [1x1 struct]
+    bias: [1x1 struct]
+    sett: [1x1 struct]
+
+</pre><p>It returns a structure with fields.</p><p>The first one, <tt>ref</tt> contains the definition of the reference system relating antenna and surface -- essentially the height of the antenna above the surface.</p><p>The one named <tt>sat</tt> is a sub-structure describing the satellite whose observations are being simulated. Essentially it defines how the satellite's azimuth and elevation angle vary over date/time.</p><p>The next variable, named <tt>sfc</tt>, describes the reflecting surface, including its geometry as well as its composition:</p><p>The variable <tt>ant</tt> describes the receiving antenna: its model, radiation pattern (gain and phase), and orientatio.</p><p>Finally, the variable <tt>opt</tt> contains general options.</p><p>The documentation for these can be accessed through the command <tt>doc snr_setup</tt>.</p><p>In practice we seldom modify <tt>setup</tt> manually, rather preferring to modify instead the input to routine <tt>snr_setup</tt>, structure <tt>sett</tt>, as returned by routine <tt>snr_settings</tt>.</p><h2>Forward model settings<a name="8"></a></h2><p>Routine <tt>snr_settings</tt> provides a data structure with default settings:</p><pre class="codeinput">sett = snr_settings();
+  display(sett)
+</pre><pre class="codeoutput">
+sett = 
+
+     sat: [1x1 struct]
+     ref: [1x1 struct]
+     opt: [1x1 struct]
+     ant: [1x1 struct]
+     sfc: [1x1 struct]
+    bias: [1x1 struct]
+
+</pre><p>Each of the sub-structures in <tt>sett</tt> describes one of the components that will be prepared by <tt>snr_setup</tt> and utilized by <tt>snr_fwd</tt>:</p><div><ul><li><tt>sett.ref</tt>: reference system;</li><li><tt>sett.ant</tt>: antenna;</li><li><tt>sett.sfc</tt>: reflecting surface;</li><li><tt>sett.sat</tt>: satellite;</li><li><tt>sett.opt</tt>: general options.</li></ul></div><p>The detailed documentation for these can be accessed in <tt>doc snr_settings</tt>. Fortunately, the majority of the settings usually can be ignored, because their default values are usually appropriate. Below we illustrate the settings most likely to be changed in practice.</p><h2>General options<a name="10"></a></h2><p>Among the general options, <tt>sett.opt</tt>, one can select which GNSS frequency is being simulated:</p><pre class="codeinput">sett = snr_settings();
+<span class="comment">% Define first signal:</span>
+sett.opt.freq_name = <span class="string">'L2'</span>;
+sett.opt.code_name = <span class="string">'L2C'</span>;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second signal:</span>
+sett.opt.freq_name = <span class="string">'L1'</span>;
+sett.opt.code_name = <span class="string">'C/A'</span>;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><pre class="codeoutput">Warning: Pre-loaded antenna data not found.
+For improved speed, please &lt;a href="matlab: snr_setup_ant_preload(); "&gt;click
+here&lt;/a&gt;;
+to disable this warning message, &lt;a href="matlab:
+warning('off','snr:setup_ant_comp:noPre')"&gt;click here instead&lt;/a&gt;. 
+</pre><img vspace="5" hspace="5" src="snr_demo_02.png" alt=""> <p>Notice the change in the modulation frequency of the SNR observations, as a consequence of the different carrier frequencies of the two signals.</p><h2>Reference system<a name="12"></a></h2><p>The vertical separation between antenna and surface is specified as follows:</p><pre class="codeinput">sett = snr_settings();
+<span class="comment">% Define first case:</span>
+sett.ref.height_ant = 1.5;  <span class="comment">% in meters</span>
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.ref.height_ant = 2.5;  <span class="comment">% in meters</span>
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><pre class="codeoutput">Warning: Pre-loaded antenna data not found.
+For improved speed, please &lt;a href="matlab: snr_setup_ant_preload(); "&gt;click
+here&lt;/a&gt;;
+to disable this warning message, &lt;a href="matlab:
+warning('off','snr:setup_ant_comp:noPre')"&gt;click here instead&lt;/a&gt;. 
+</pre><img vspace="5" hspace="5" src="snr_demo_03.png" alt=""> <p>Notice again a change in the modulation frequency of the SNR observations, at this time a consequence of the different antenna heights, for a fixed electromagnetic frequency.</p><p>It should be noted that units are standardized across all routines:</p><div><ul><li>lengths, including height, wavelength, depth, thickness, are always given in meters;</li><li>frequencies, such as electromagnetic propagation frequency, and also bandwidth, are always in hertz;</li><li>angles, including azimuth and elevation angle as well as phase, are always in degrees (not radians);</li></ul></div><h2>Antenna orientation<a name="14"></a></h2><p>Although the antenna is typically installed upright (i.e., with boresight facing zenith), sometimes it is intentionally tilted, for better reception of reflected signals; this can be achieved as follows:</p><pre class="codeinput">sett = snr_settings();
+sett.ref.dist_arp_pivot = 0;
+sett.ref.ignore_vec_apc_arp = true;
+warning(<span class="string">'off'</span>, <span class="string">'snr:snr_setup_origin:IgnoreVecApcArp'</span>)
+<span class="comment">% Define first case:</span>
+sett.ant.slope = 0;
+sett.ant.aspect = 0;
+sett.ant.axial = 0;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.ant.slope = 90;  <span class="comment">% in degrees.</span>
+sett.ant.aspect = midrange(result0.sat.azim);  <span class="comment">% facing the rising or setting sat.</span>
+sett.ant.axial = 0;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_04.png" alt=""> <p>A value of <tt>sett.ant.slope = 0</tt> means upright; only when the slope angle is non-zero is that the setting <tt>sett.ant.aspect</tt> has an effect: it dictates the azimuth faced by the antenna boresight. Finally, <tt>sett.ant.axial</tt> specifies one last rotation, around the antenna's own axis; usually it has a less dramatic effect, because typical GNSS antennas are designed to be omni-directional.</p><p>Normally antenna rotation would be influenced by the antenna model, because each model has a particular offset between its antenna phase center (APC) and antenna reference point (ARP) -- see graphs and links below for details. Here we have forced these offsets to be ignored, issuing <tt>sett.ref.ignore_vec_apc_arp = true</tt>.</p><p><img vspace="5" hspace="5" src="dia.png" alt=""> </p><p>It should be clarified that the antenna height, <tt>sett.ref.height_ant</tt> -- (1) in the diagram -- refers to the pivot point, i.e., the topmost point on the antenna mount that remains unchanged to rotations. Then the lever arm length, <tt>sett.ref.dist_arp_pivot</tt> -- (2) in the diagram --, gives the pivot-ARP distance. The latter is to be added along the antenna axial direction to the ARP-APC vector offset -- (3) in the diagram -- before the total pivot-APC offset is rotated as per antenna orientation angles (axial, slope, and aspect).</p><h2>Antenna model<a name="16"></a></h2><p>Different antenna models yield slightly different SNR observations given the same reflecting surface and antenna setup:</p><pre class="codeinput">sett = snr_settings();
+sett.ref.ignore_vec_apc_arp = true;
+warning(<span class="string">'off'</span>, <span class="string">'snr:snr_setup_origin:IgnoreVecApcArp'</span>)
+<span class="comment">% Define first case:</span>
+sett.ant.model = <span class="string">'TRM41249.00'</span>;  sett.ant.radome = <span class="string">'NONE'</span>;  <span class="comment">% @ NWOT</span>
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.ant.model = <span class="string">'TRM29659.00'</span>;  sett.ant.radome = <span class="string">'SCIT'</span>;  <span class="comment">% @ LOW3</span>
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><pre class="codeoutput">Warning: Pre-loaded antenna data not found.
+For improved speed, please &lt;a href="matlab: snr_setup_ant_preload(); "&gt;click
+here&lt;/a&gt;;
+to disable this warning message, &lt;a href="matlab:
+warning('off','snr:setup_ant_comp:noPre')"&gt;click here instead&lt;/a&gt;. 
+Warning: Pre-loaded antenna data not found.
+For improved speed, please &lt;a href="matlab: snr_setup_ant_preload(); "&gt;click
+here&lt;/a&gt;;
+to disable this warning message, &lt;a href="matlab:
+warning('off','snr:setup_ant_comp:noPre')"&gt;click here instead&lt;/a&gt;. 
+</pre><img vspace="5" hspace="5" src="snr_demo_05.png" alt=""> <p>Antenna and radome identification follow the IGS naming conventions (see <a href="ftp://igscb.jpl.nasa.gov/pub/station/general/rcvr_ant.tab">here</a>). For example, <tt>TRM29659.00</tt> stands for "Trimble L1/L2 Dorne Margolin element with chokerings". Beware that it is not uncommon to exist several versions of the same antenna type; e.g., both <tt>LEIAT504</tt> and <tt>LEIAT504GG</tt> are Leica's "L1/L2 Dorne Margolin antenna with chokerings", although one is GPS-only while the other is GPS &amp; GLONASS capable.</p><p>Results here reflect the difference in the antenna gain patterns. Again, normally they would also reflect ARP-APC offset particular to each antenna model, which are simply added to antenna height when it is not rotated. Here we have forced these offsets to be ignored, issuing <tt>sett.ref.ignore_vec_apc_arp = true</tt>. See graphs and links below for details.</p><p><a href="http://archive.unavco.org/network/logs/nwotlog.txt">TRM41249.00:</a></p><pre>   / ----------------------+--------------------- \   &lt;--  0.0714  L1
+  +                        +                       +  &lt;--  0.0682  L2
+   \ -------------------------------------------- /
+                   \               /
+                    \             /
+                     \-----+-----/                    &lt;--  0.0000  ARP=TOP</pre><p><a href="http://archive.unavco.org/network/logs/low3log.txt">TRM29659.00:</a></p><pre>                        -----
+                    /     +     \                        &lt;--  0.128  L2
+                   |      +      |                       &lt;--  0.110  L1
+ +--------------------------------------------------+    &lt;--  0.102  TCR
+ |                                                  |
+ |                                                  |
+ |                                                  |
+ |                                                  |
++-+--------------------------------------------------+-+  &lt;--  0.038
++-------------------+-------------+--------------------+  &lt;--  0.035  BCR
+                   |             |
+                  =|             |
+                   +------x------+                       &lt;--  0.000  BPA=ARP</pre><h2>Surface tilting<a name="20"></a></h2><p>Just like the antenna's slope &amp; aspect angles, we can also define surface's slope &amp; aspect (where the latter defines the azimuth being faced by the surface):</p><pre class="codeinput">sett = snr_settings();
+sett.sfc.fnc_snr_setup_sfc_geometry = @snr_setup_sfc_geometry_tilted;
+<span class="comment">% Define first case:</span>
+sett.sfc.slope = 0;
+sett.sfc.aspect = 0;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.sfc.slope = 15;
+sett.sfc.aspect = midrange(result.sat.azim) - 90;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_06.png" alt=""> <p>The effect of slope is very much aspect-dependent; when the surface faces an azimuth opposite to the satellite's, the reflection will no longer be visible if the satellite's elevation angle is smaller than the surface's slope:</p><pre class="codeinput">sett.sfc.slope = 10;
+sett.sfc.aspect = midrange(result.sat.azim) + 180;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0); <span class="comment">%ylim([-4,+14])</span>
+</pre><img vspace="5" hspace="5" src="snr_demo_07.png" alt=""> <h2>Surface undulations<a name="22"></a></h2><p>The support for surface undulations in the forward model is to be demonstrated in future revisions of this document.</p><h2>Surface roughness<a name="23"></a></h2><p>Roughness is specified by the surface height standard deviation with respect to a mean or trend surface:</p><pre class="codeinput">sett = snr_settings();
+<span class="comment">% Define first case:</span>
+sett.sfc.height_std = 0;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.sfc.height_std = 25e-2;  <span class="comment">% in meters</span>
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_08.png" alt=""> <p>Random roughness diminishes the coherently scattered power, thus causing a decrease in the magnitude of multipath modulation. The effect is more pronounced at higher elevation angles.</p><h2>Material composition<a name="25"></a></h2><p>Material composition is a medium property and is held as one of the surface settings, <tt>sett.sfc</tt>:</p><pre class="codeinput">sett = snr_settings();
+<span class="comment">% Define first case:</span>
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_bottom = <span class="string">'wet soil fixed'</span>;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.sfc.material_bottom = <span class="string">'dry soil fixed'</span>;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_09.png" alt=""> <p>Here we see how soil moisture produces a change in both phase and amplitude of the multipath modulation.</p><p>Even assuming a homogeneous or uniform medium (also known as half-space), there are several materials to choose:</p><pre class="codeinput">get_permittivity(<span class="string">'list'</span>)
+<span class="comment">% Please see |doc get_permittivity| for input and output syntax.</span>
+</pre><pre class="codeoutput">
+ans = 
+
+    'vacuum'
+    'air'
+    'grass'
+    'asphalt'
+    'polystyrene'
+    'styrofoam'
+    'dry snow fixed'
+    'dry snow'
+    'soil'
+    'soil default'
+    'seawater variable'
+    'seawater'
+    'wet soil'
+    'freshwater'
+    'dry/wet soil'
+    'dry ground'
+    'concrete'
+    'ice'
+    'steel'
+    'zinc'
+    'aluminum'
+    'copper'
+    'perfect electric conductor'
+
+</pre><p>Some materials are predefined, such as <tt>'wet soil fixed'</tt> and <tt>'dry soil fixed'</tt> above, and also <tt>'dry snow fixed'</tt>, in which cases <tt>sett.sfc.material_bottom</tt> holds only their names. Other materials require certain parameter values as additional input; in such cases <tt>sett.sfc.material_bottom</tt> is a structure, as follows:</p><pre class="codeinput">sett = snr_settings();
+<span class="comment">% Define first case:</span>
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = <span class="string">'air'</span>;
+sett.sfc.material_bottom = struct();
+sett.sfc.material_bottom.name = <span class="string">'dry snow'</span>;
+sett.sfc.material_bottom.density = 0.5;
+sett.sfc.material_bottom.temperature = -10;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+<span class="comment">% Define second case:</span>
+sett.sfc.material_bottom = struct();
+sett.sfc.material_bottom.name = <span class="string">'soil'</span>;
+sett.sfc.material_bottom.type = <span class="string">'sandy loam'</span>;
+sett.sfc.material_bottom.moisture = 0.25;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+<span class="comment">% Compare:</span>
+snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_10.png" alt=""> <h2>Material stratification/layering<a name="28"></a></h2><p>A separate demo/tutorial is kept in <tt>snr_demo_layer</tt>, or <a href="snr_demo_layer.html">here</a></p><h2>Satellite<a name="29"></a></h2><p>We can define the simulation independent variables by changing the structure <tt>sett.sat</tt>:</p><pre class="codeinput">sett.sat = struct();
+sett.sat.num_obs = 100;  <span class="comment">% number of observations</span>
+sett.sat.elev_lim = [2.5, 90];  <span class="comment">% elevation angle limits (min, max)</span>
+sett.sat.azim_lim = 0;  <span class="comment">% azimuth limits (vector) or constant value (scalar)</span>
+</pre><p>Now compare the results:</p><pre class="codeinput">setup = snr_setup (sett);
+result = snr_fwd (setup);
+  snr_demo_plot2 (result, result0)
+</pre><img vspace="5" hspace="5" src="snr_demo_11.png" alt=""> <p>Instead of defining the limits and number of observations, we can specify exactly the satellite direction at which synthetic observations will be simulated:</p><pre class="codeinput">sett.sat = struct();
+sett.sat.elev = [5; 7; 10];
+sett.sat.azim = 180;
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+  snr_demo_plot2 (result, result0)
+</pre><p>This is useful if you have measured observations, in which case you could do something like this:</p><pre class="language-matlab">sett.sat = struct();
+sett.sat.elev = load(<span class="string">'elev.txt'</span>);
+sett.sat.azim = load(<span class="string">'azim.txt'</span>);
+</pre><img vspace="5" hspace="5" src="snr_demo_12.png" alt=""> <h2>Carrier-phase and pseudorange multipath errors<a name="33"></a></h2><p>Routine <tt>snr_fwd</tt> offers more than one output variable:</p><pre class="codeinput">sett = snr_settings();
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+</pre><p>The third return variable, <tt>carrier_error</tt>, gives the carrier-phase multipath error, and the fourth one, <tt>code_error</tt>, the code or pseudorange multipath error; these complement <tt>snr_db</tt> is characterizing the impact of multipath on GNSS observations:</p><pre class="codeinput">snr_demo_plot_error (result)
+</pre><img vspace="5" hspace="5" src="snr_demo_13.png" alt=""> <p>For small-delay reflections, typical near grazing incidence on horizontal surfaces (but not necessarily so on undulated surfaces), code modulation can be disabled without significant accuracy degradation in either SNR or carrier-phase error, if we are not interested in the code error itself:</p><pre class="codeinput">sett.opt.dsss.disable = true;
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+snr_demo_plot_error (result)
+</pre><img vspace="5" hspace="5" src="snr_demo_14.png" alt=""> <p>The return variable, <tt>result</tt>, contains intermediary results employed internally by <tt>snr_fwd</tt>:</p><pre class="codeinput">  display(result)
+</pre><pre class="codeoutput">
+result = 
+
+                   direct: [1x1 struct]
+                reflected: [1x1 struct]
+                 incident: [1x1 struct]
+                      pre: [1x1 struct]
+            phasor_direct: [250x1 double]
+         phasor_reflected: [250x1 double]
+          delay_reflected: [250x1 double]
+        doppler_reflected: [250x1 double]
+       phasor_bias_direct: 1
+    phasor_bias_reflected: 1
+               delay_bias: 0
+          delay_composite: [250x1 double]
+         phasor_composite: [250x1 double]
+             delay_direct: 0
+              delay_error: [250x1 double]
+             delay_interf: [250x1 double]
+             phasor_error: [250x1 double]
+            phasor_interf: [250x1 double]
+          power_composite: [250x1 double]
+            carrier_error: [250x1 double]
+               code_error: [250x1 double]
+                   snr_db: [250x1 double]
+               power_loss: [250x1 double]
+                     geom: [1x1 struct]
+                      sat: [1x1 struct]
+
+</pre><p>This is useful if you want detailed information about specific aspects of the model. The reflection geometry (positions and directions) is described in the sub-structure <tt>extra.geom</tt>:</p><pre class="codeinput">  disp(result.geom)
+</pre><pre class="codeoutput">           num_dirs: 250
+    num_reflections: 1
+             direct: [1x1 struct]
+        reflections: [1x1 struct]
+         reflection: [1x1 struct]
+
+</pre><pre class="codeinput"><span class="comment">%close all</span>
+<span class="comment">%#ok&lt;*NOPTS,*NASGU&gt;</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% A GNSS multipath simulator for near-surface reflectometry and positioning applications.
+% The routines demonstrated here provide model counterparts to actual SNR
+% observations. They require _a priori_ information about the parameters
+% affecting the amount of attenuation as well as group and phase delay
+% exhibited by reflected signals, compared to the direct or line-of-sight
+% signal. These parameters describe:
+% 
+% # the properties of target surface (geometry & composition),
+% # the measurement system characteristics (PRN modulation, receiver
+% tracking algorithms, antenna radiation patterns), and
+% # the monitoring setup (the height of the antenna above the surface, as
+% well as its orientation).
+% 
+% This demo itself is writen in MATLAB; you can see its souce code clicking
+% <../snr_demo.m here>.  We assume that the search path has already been 
+% modified as appropriate for your installation; otherwise, please search 
+% for |do_addpath.m|.
+
+%% Defaults
+% A quick run can be performed using default settings in a single step:
+snr_fwd();
+
+%%
+% Default settings can be accessed in three easy steps:
+sett = snr_settings();
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+%%
+% Now we will give an overview of each of the three previous steps. Later
+% we will illustrate the most common modifications to the defaults.
+% 
+% We will save the default results for comparison, and will use an
+% auxiliary plotting routine, |snr_demo_plot2|.
+sett0 = sett;
+result0 = result;
+
+%% Forward model run
+% Routine |snr_fwd| outputs a return variable containing the the model equivalent to SNR observations along with other observables:
+result = snr_fwd (setup);
+%%%
+% Its input argument is obtained as output from routine |snr_setup|,
+% described next.
+
+%% Forward model setup
+setup = snr_setup (sett);
+  disp(setup)
+%%
+% It returns a structure with fields. 
+% 
+% The first one, |ref| contains the definition of the reference system
+% relating antenna and surface REPLACE_WITH_DASH_DASH essentially the height of the antenna
+% above the surface.
+% 
+% The one named |sat| is a sub-structure describing the satellite whose
+% observations are being simulated. Essentially it defines how the
+% satellite's azimuth and elevation angle vary over date/time.
+% 
+% The next variable, named |sfc|, describes the reflecting surface,
+% including its geometry as well as its composition:
+% 
+% The variable |ant| describes the receiving antenna: its model, radiation
+% pattern (gain and phase), and orientatio.
+% 
+% Finally, the variable |opt| contains general options.
+%
+% The documentation for these can be accessed through the command |doc
+% snr_setup|.
+% 
+% In practice we seldom modify |setup| manually, rather preferring to
+% modify instead the input to routine |snr_setup|, structure |sett|, 
+% as returned by routine |snr_settings|.
+
+%% Forward model settings
+% Routine |snr_settings| provides a data structure with default
+% settings:
+sett = snr_settings();
+  display(sett)
+%%
+% Each of the sub-structures in |sett| describes one of the components that
+% will be prepared by |snr_setup| and utilized by |snr_fwd|:
+% 
+% * |sett.ref|: reference system;
+% * |sett.ant|: antenna;
+% * |sett.sfc|: reflecting surface;
+% * |sett.sat|: satellite;
+% * |sett.opt|: general options.
+%
+% The detailed documentation for these can be accessed in |doc
+% snr_settings|. Fortunately, the majority of the settings usually can be
+% ignored, because their default values are usually appropriate. Below we
+% illustrate the settings most likely to be changed in practice.
+
+%% General options
+% Among the general options, |sett.opt|, one can select which GNSS frequency
+% is being simulated:
+sett = snr_settings();
+% Define first signal:
+sett.opt.freq_name = 'L2';
+sett.opt.code_name = 'L2C';
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second signal:
+sett.opt.freq_name = 'L1';
+sett.opt.code_name = 'C/A';
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%%
+% Notice the change in the modulation frequency of the SNR observations, as
+% a consequence of the different carrier frequencies of the two signals.
+
+%% Reference system
+% The vertical separation between antenna and surface is specified as
+% follows:
+sett = snr_settings();
+% Define first case:
+sett.ref.height_ant = 1.5;  % in meters
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.ref.height_ant = 2.5;  % in meters
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%%
+% Notice again a change in the modulation frequency of the SNR
+% observations, at this time a consequence of the different antenna
+% heights, for a fixed electromagnetic frequency.
+% 
+% It should be noted that units are standardized across all routines: 
+% 
+% * lengths, including height, wavelength, depth, thickness, are always
+% given in meters; 
+% * frequencies, such as electromagnetic propagation frequency, and also
+% bandwidth, are always in hertz;
+% * angles, including azimuth and elevation angle as well as phase, are
+% always in degrees (not radians);
+%
+
+%% Antenna orientation
+% Although the antenna is typically installed upright (i.e., with boresight
+% facing zenith), sometimes it is intentionally tilted, for better
+% reception of reflected signals; this can be achieved as follows:
+sett = snr_settings();
+sett.ref.dist_arp_pivot = 0;
+sett.ref.ignore_vec_apc_arp = true;
+warning('off', 'snr:snr_setup_origin:IgnoreVecApcArp')
+% Define first case:
+sett.ant.slope = 0;
+sett.ant.aspect = 0;
+sett.ant.axial = 0;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.ant.slope = 90;  % in degrees.
+sett.ant.aspect = midrange(result0.sat.azim);  % facing the rising or setting sat.
+sett.ant.axial = 0;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%%
+% A value of |sett.ant.slope = 0| means upright; only when the slope angle
+% is non-zero is that the setting |sett.ant.aspect| has an effect: it
+% dictates the azimuth faced by the antenna boresight. Finally,
+% |sett.ant.axial| specifies one last rotation, around the antenna's own
+% axis; usually it has a less dramatic effect, because typical GNSS antennas
+% are designed to be omni-directional.
+% 
+% Normally antenna rotation would be influenced by the antenna model,
+% because each model has a particular offset between its antenna phase
+% center (APC) and antenna reference point (ARP) REPLACE_WITH_DASH_DASH see graphs and links
+% below for details. Here we have forced these offsets to be ignored,
+% issuing |sett.ref.ignore_vec_apc_arp = true|. 
+% 
+% <<dia.png>>
+% 
+% It should be clarified that the antenna height,
+% |sett.ref.height_ant| REPLACE_WITH_DASH_DASH (1) in the diagram REPLACE_WITH_DASH_DASH refers to the
+% pivot point, i.e., the topmost point on the antenna mount that remains
+% unchanged to rotations. Then the lever arm length,
+% |sett.ref.dist_arp_pivot| REPLACE_WITH_DASH_DASH (2) in the diagram REPLACE_WITH_DASH_DASH, gives the pivot-ARP
+% distance. The latter is to be added along the antenna axial direction to
+% the ARP-APC vector offset REPLACE_WITH_DASH_DASH (3) in the diagram REPLACE_WITH_DASH_DASH before the total
+% pivot-APC offset is rotated as per antenna orientation angles (axial,
+% slope, and aspect).
+
+%% Antenna model
+% Different antenna models yield slightly different SNR observations given
+% the same reflecting surface and antenna setup:
+sett = snr_settings();
+sett.ref.ignore_vec_apc_arp = true;
+warning('off', 'snr:snr_setup_origin:IgnoreVecApcArp')
+% Define first case:
+sett.ant.model = 'TRM41249.00';  sett.ant.radome = 'NONE';  % @ NWOT
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.ant.model = 'TRM29659.00';  sett.ant.radome = 'SCIT';  % @ LOW3
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%%
+% Antenna and radome identification follow the IGS naming conventions (see 
+% <ftp://igscb.jpl.nasa.gov/pub/station/general/rcvr_ant.tab here>). For
+% example, |TRM29659.00| stands for "Trimble L1/L2 Dorne Margolin element
+% with chokerings". Beware that it is not uncommon to exist several
+% versions of the same antenna type; e.g., both |LEIAT504| and |LEIAT504GG|
+% are Leica's "L1/L2 Dorne Margolin antenna with chokerings", although one
+% is GPS-only while the other is GPS & GLONASS capable.
+% 
+% Results here reflect the difference in the antenna gain patterns.
+% Again, normally they would also reflect ARP-APC offset particular to each
+% antenna model, which are simply added to antenna height when it is not
+% rotated. Here we have forced these offsets to be ignored, issuing
+% |sett.ref.ignore_vec_apc_arp = true|. See graphs and links below for
+% details.
+%%
+% <http://archive.unavco.org/network/logs/nwotlog.txt TRM41249.00:>
+% 
+%     / REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH+REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH- \   <REPLACE_WITH_DASH_DASH  0.0714  L1
+%    +                        +                       +  <REPLACE_WITH_DASH_DASH  0.0682  L2
+%     \ REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH /   
+%                     \               /
+%                      \             /
+%                       \REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-+REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-/                    <REPLACE_WITH_DASH_DASH  0.0000  ARP=TOP
+% 
+%%
+% <http://archive.unavco.org/network/logs/low3log.txt TRM29659.00:>
+% 
+%                          REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+%                      /     +     \                        <REPLACE_WITH_DASH_DASH  0.128  L2
+%                     |      +      |                       <REPLACE_WITH_DASH_DASH  0.110  L1
+%   +REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH+    <REPLACE_WITH_DASH_DASH  0.102  TCR
+%   |                                                  |
+%   |                                                  |
+%   |                                                  |
+%   |                                                  |
+% +-+REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH+-+  <REPLACE_WITH_DASH_DASH  0.038
+% +REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-+REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-+REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH+  <REPLACE_WITH_DASH_DASH  0.035  BCR
+%                     |             |
+%                    =|             |
+%                     +REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHxREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH+                       <REPLACE_WITH_DASH_DASH  0.000  BPA=ARP
+% 
+
+%% Surface tilting
+% Just like the antenna's slope & aspect angles, we can also define
+% surface's slope & aspect (where the latter defines the azimuth being
+% faced by the surface):
+sett = snr_settings();
+sett.sfc.fnc_snr_setup_sfc_geometry = @snr_setup_sfc_geometry_tilted;
+% Define first case:
+sett.sfc.slope = 0;
+sett.sfc.aspect = 0;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.sfc.slope = 15;
+sett.sfc.aspect = midrange(result.sat.azim) - 90;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%%
+% The effect of slope is very much aspect-dependent; when the surface faces
+% an azimuth opposite to the satellite's, the reflection will no longer be
+% visible if the satellite's elevation angle is smaller than the surface's
+% slope:
+sett.sfc.slope = 10;
+sett.sfc.aspect = midrange(result.sat.azim) + 180;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0); %ylim([-4,+14])
+
+%% Surface undulations
+% The support for surface undulations in the forward model is to be
+% demonstrated in future revisions of this document.
+
+%% Surface roughness
+% Roughness is specified by the surface height standard deviation with
+% respect to a mean or trend surface:
+sett = snr_settings();
+% Define first case:
+sett.sfc.height_std = 0;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.sfc.height_std = 25e-2;  % in meters
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+
+%% 
+% Random roughness diminishes the coherently scattered power, thus causing
+% a decrease in the magnitude of multipath modulation. The effect is more
+% pronounced at higher elevation angles.
+
+%% Material composition
+% Material composition is a medium property and is held as one of the
+% surface settings, |sett.sfc|:
+sett = snr_settings();
+% Define first case:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = 'air';
+sett.sfc.material_bottom = 'wet soil fixed';
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.sfc.material_bottom = 'dry soil fixed';
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+%% 
+% Here we see how soil moisture produces a change in both phase and
+% amplitude of the multipath modulation.
+% 
+% Even assuming a homogeneous or uniform medium (also known as half-space),
+% there are several materials to choose:
+get_permittivity('list')
+% Please see |doc get_permittivity| for input and output syntax.
+
+%%
+% Some materials are predefined, such as |'wet soil fixed'| and |'dry soil
+% fixed'| above, and also |'dry snow fixed'|, in which cases
+% |sett.sfc.material_bottom| holds only their names. Other materials
+% require certain parameter values as additional input; in such cases
+% |sett.sfc.material_bottom| is a structure, as follows:
+sett = snr_settings();
+% Define first case:
+sett.sfc.fnc_snr_setup_sfc_material = @snr_setup_sfc_material_halfspaces;
+sett.sfc.material_top = 'air';
+sett.sfc.material_bottom = struct();
+sett.sfc.material_bottom.name = 'dry snow';
+sett.sfc.material_bottom.density = 0.5;
+sett.sfc.material_bottom.temperature = -10;
+  setup = snr_setup (sett);
+  result0 = snr_fwd (setup);
+% Define second case:
+sett.sfc.material_bottom = struct();
+sett.sfc.material_bottom.name = 'soil';
+sett.sfc.material_bottom.type = 'sandy loam';
+sett.sfc.material_bottom.moisture = 0.25;
+  setup = snr_setup (sett);
+  result = snr_fwd (setup);
+% Compare:
+snr_demo_plot2 (result, result0)
+
+%% Material stratification/layering
+% A separate demo/tutorial is kept in |snr_demo_layer|, or
+% <snr_demo_layer.html here>
+
+%% Satellite
+% We can define the simulation independent variables by changing the
+% structure |sett.sat|:
+sett.sat = struct();
+sett.sat.num_obs = 100;  % number of observations
+sett.sat.elev_lim = [2.5, 90];  % elevation angle limits (min, max)
+sett.sat.azim_lim = 0;  % azimuth limits (vector) or constant value (scalar)
+%%%
+% Now compare the results:
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+  snr_demo_plot2 (result, result0)
+%%
+% Instead of defining the limits and number of observations, we can specify
+% exactly the satellite direction at which synthetic observations will be
+% simulated:
+sett.sat = struct();
+sett.sat.elev = [5; 7; 10];
+sett.sat.azim = 180;
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+  snr_demo_plot2 (result, result0)
+%%%
+% This is useful if you have measured observations, in which case you could do
+% something like this:
+% 
+%   sett.sat = struct();
+%   sett.sat.elev = load('elev.txt');
+%   sett.sat.azim = load('azim.txt');
+% 
+
+%% Carrier-phase and pseudorange multipath errors
+% Routine |snr_fwd| offers more than one output variable:
+sett = snr_settings();
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+%%%
+% The third return variable, |carrier_error|, gives the carrier-phase
+% multipath error, and the fourth one, |code_error|, the code or
+% pseudorange multipath error; these complement |snr_db| is characterizing
+% the impact of multipath on GNSS observations:
+snr_demo_plot_error (result)
+
+%% 
+% For small-delay reflections, typical near grazing incidence on horizontal
+% surfaces (but not necessarily so on undulated surfaces), code modulation
+% can be disabled without significant accuracy degradation in either SNR or
+% carrier-phase error, if we are not interested in the code error itself:
+sett.opt.dsss.disable = true;
+setup = snr_setup (sett);
+result = snr_fwd (setup);
+snr_demo_plot_error (result)
+
+%% 
+% The return variable, |result|, contains intermediary results
+% employed internally by |snr_fwd|:
+  display(result)
+%%
+% This is useful if you want detailed information about specific aspects of
+% the model. 
+% The reflection geometry (positions and directions) is described in the 
+% sub-structure |extra.geom|:
+  disp(result.geom)
+
+%% 
+%close all
+%#ok<*NOPTS,*NASGU>
+
+##### SOURCE END #####
+--></body></html>

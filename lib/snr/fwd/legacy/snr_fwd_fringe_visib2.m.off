@@ -1,0 +1,8 @@
+function [fringe_visib, fringe_pow, fringe_ampl] = snr_fwd_fringe_visib2 (phasor_direct, phasor_reflected)
+    [~, phasor_composite_max]  = snr_fwd_fringe_aux (phasor_direct, phasor_reflected, true, false);
+    [~, phasor_composite_none] = snr_fwd_fringe_aux (phasor_direct, phasor_reflected, false, true);
+    fringe_phasor = phasor_composite_max ./ phasor_composite_none;
+    fringe_ampl = abs(fringe_phasor);
+    fringe_pow = fringe_ampl.^2;
+    fringe_visib = decibel_power(fringe_pow);
+end

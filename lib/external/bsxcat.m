@@ -1,0 +1,58 @@
+function C = bsxcat(dim, A, B, varargin)
+% C = BSXCAT(DIM, A, B) concatenate the arrays A and B along
+% the dimension DIM with auto expansion of singleton enabled.
+%   
+% Excepted the dimension DIM, each other dimension of A and B must be equal
+% to each other, or equal to one.
+% Whenever a dimension of one of A or B is singleton (equal to 1),
+% the array is replicated along that dimension to match the other array.
+% Then the arrays A and B are concatenated.
+% The size of the output array C satisfied:
+%   size(C,dim) = size(A,dim) + size(B,dim),
+%   max(size(A,n),size(B,n))*(size(A,n)>0 & size(B,n)>0) for n ~= DIM.
+% For example, if
+%   dim = 3
+%   size(A) == [2 5 4] and size(B) == [2 1 4 3], then size(C) == [2 5 8
+% 
+% Example:
+%     Insert the zeros-row on top of 3x3 matrix
+%       M = magic(3)
+%       bsxcat(1,0,M)
+%     Concatenate the ones-column on right of 3x3 matrix
+%       M = magic(3)
+%       bsxcat(2,M,1)
+%
+% See also: CAT, BSXFUN
+%
+% Author: Bruno Luong <brunoluonf@yahoo.com>
+% Last update: 25-Aug-2011
+
+% The dimension of C
+nd = max([ndims(A),ndims(B) dim]);
+
+% Pad 1 to trailing
+szA = size(A);
+szB = size(B);
+szA(end+1:nd) = 1;
+szB(end+1:nd) = 1;
+
+% Which dimension(s) we need to expand
+iA = szA==1 & szB~=1; % for A
+iB = szB==1 & szA~=1; % for B
+iA(dim) = false;
+iB(dim) = false;
+
+repA = ones(1,nd);
+repB = ones(1,nd);
+repA(iA) = szB(iA);
+repB(iB) = szA(iB);
+if any(repA ~= 1)
+    A = repmat(A, repA);
+end
+if any(repB ~= 1)
+    B = repmat(B, repB);
+end
+C = cat(dim, A, B);
+
+if (nargin > 3),  C = bsxcat(dim, C, varargin{:});  end
+end % bsxcat

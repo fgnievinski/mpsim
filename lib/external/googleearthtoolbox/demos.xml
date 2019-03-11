@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<demos>
+
+<matlabrelease>14</matlabrelease>
+<name>Google Earth</name>
+<type>toolbox</type>
+<icon>$toolbox/matlab/icons/matlabicon.gif</icon>
+<description>
+The Google Earth toolbox is a collection of plotting functions used for visualizing data within the Google Earth Viewer.
+</description>
+
+<demosection>
+   <label>Drawing Functions</label>
+   <demoitem>
+      <label>demo of ge_box</label>
+      <callback>ge_demo('ge_box')</callback>
+   </demoitem>
+   <demoitem>
+      <label>demo of ge_circle</label>
+      <callback>/code/demo_ge_circle</callback>
+   </demoitem>
+   <demoitem>
+      <label>demo of ge_cylinder</label>
+      <callback>/code/demo_ge_cylinder</callback>
+   </demoitem>
+
+</demosection>
+
+<demosection>
+   <label> Plotting functions </label>
+   <demoitem>
+      <label>demo of ge_imagesc</label>
+      <callback>/code/demo_ge_imagesc</callback>
+   </demoitem>
+   <demoitem>
+      <label>demo of ge_quiver3</label>
+      <callback>/code/demo_ge_quiver3</callback>
+   </demoitem>
+</demosection>
+
+<demosection>
+   <label>Other Functions</label>
+   <demoitem>
+      <label>A demo of ge_output</label>
+      <callback>/code/demo_ge_output</callback>
+   </demoitem>
+   <demoitem>
+      <label>A demo of ge_colorbar</label>
+      <callback>/code/demo_ge_colorbar</callback>
+   </demoitem>
+</demosection>
+
+</demos>

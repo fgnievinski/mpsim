@@ -1,0 +1,14 @@
+function c = plus_all (a, b)
+    [na,ma] = size(a);
+    [nb,mb] = size(b);
+    assert(ma == mb);
+    if (na == nb)
+        c = a + b;
+    elseif (na == 1) || (nb == 1)
+        temp = arrayfun(@(i) a(:,i) + b(:,i), 1:ma, ...
+            'UniformOutput',false);
+        c = cell2mat(temp);
+    else
+        error('matlab:dot_all:badSize', 'Bad size.');
+    end
+end

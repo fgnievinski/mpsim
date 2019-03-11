@@ -1,0 +1,38 @@
+function [out, method] = frontal_diag (in, method)
+    if (nargin < 2),  method = '';  end
+    [m,n,p] = size(in);
+    q = min(m,n);
+    out = NaN(q,1,p);
+    if strcmp(method, 'q') || (isempty(method) && (q < p))
+        for k=1:q
+            out(k,1,:) = in(k,k,:);
+        end
+        method = 'q';
+    elseif strcmp(method, 'p') || (isempty(method) && (p <= q))
+        for k=1:p
+            out(:,:,k)= diag(in(:,:,k));
+        end
+        method = 'p';
+    end
+end
+
+%!test
+%! in = eye(3);
+%! out = diag(in)
+%! out2 = frontal_diag (in)
+%! myassert(out2, out)
+
+%!test
+%! rand('seed',0);
+%! m = 1+ceil(10*rand);
+%! n = 1+ceil(10*rand);
+%! p = 1+ceil(10*rand);
+%! in = rand(m,n,p);
+%! out = frontal_diag (in)
+%! [out2, m2] = frontal_diag (in, 'q')
+%! [out3, m3] = frontal_diag (in, 'p')
+%! myassert(m2, 'q')
+%! myassert(m3, 'p')
+%! myassert(out2, out)
+%! myassert(out3, out)
+

@@ -1,0 +1,8 @@
+function varargout = isequaln (varargin)
+    try
+        [varargout{1:nargout}] = builtin ('isequaln', varargin{:});
+    catch
+        [varargout{1:nargout}] = builtin ('isequalwithequalnans', varargin{:});
+    end
+end
+

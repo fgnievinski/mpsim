@@ -1,0 +1,13 @@
+function out = frontal_pt2 (in)
+    [m,n,p] = size(in);
+    assert(p==1);
+    out = reshape(in, m, 1, n);
+end
+
+%!test
+%! in = [1 2 3; 4 5 6];
+%! out = cat(3, [1; 4], [2; 5], [3; 6]);
+%! out2 = frontal_pt2(in);
+%! %out, out2  % DEBUG
+%! assert(out, out2);
+

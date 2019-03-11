@@ -1,0 +1,57 @@
+%TODO: generalize this for other colormaps
+%(hint: ask for ref value in data and in colormap)
+%then illustrate it with geoid and cptcmap and upload it to FX.
+function h = colormap_bwr_it (varargin)
+    error(nargchk(0, 5, nargin, 'struct'));
+    f = 1;
+    cl = [];
+    cl2 = [];
+    switch nargin
+%     case 0
+%         ax = gca;
+%         data = reshape(get(findobj('Type','image'), 'CData'), [], 1);
+%         whos data
+%         f = 1;
+%         cl = [];
+    case 1
+        ax = gca;
+        data = varargin{1};
+    case 2
+        ax = varargin{1};
+        data = varargin{2};
+    case 3
+        ax = varargin{1};
+        data = varargin{2};
+        f = varargin{3};
+    case 4
+        ax = varargin{1};
+        data = varargin{2};
+        f = varargin{3};
+        cl = varargin{4};
+    case 5
+        ax = varargin{1};
+        data = varargin{2};
+        f = varargin{3};
+        cl = varargin{4};
+        cl2 = varargin{5};
+    end
+    
+    data = reshape(data, [], 1);
+    %data = data(~isnan(data));
+    if isempty(cl)
+        temp = f*max(abs(data));
+        cl = [-temp, +temp];
+        cl2 = f*[min(data),max(data)];
+        %keyboard
+    end
+    if isempty(cl2)
+        cl2 = cl;
+    end
+    cl, cl2  % DEBUG
+    set(ax, 'CLim', f*cl)
+    colormap(colormap_bwr)
+    h = colorbar;
+      set(h, 'YLim', cl2);
+    if (nargout == 0),  clear h;  end
+end
+

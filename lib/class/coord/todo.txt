@@ -1,0 +1,3 @@
+- create class coord or pt
+	overload operators: pt * len = pt .* repmat(len,1,size(pt,2))
+	overload functions: norm, normalize, dot, cross

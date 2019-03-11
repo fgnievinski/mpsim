@@ -1,0 +1,52 @@
+<productinfo
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="optional">
+<?xml-stylesheet type="text/xsl" href="optional"?>
+
+<matlabrelease>14</matlabrelease>
+<name>Google Earth</name>
+<type>toolbox</type>
+<icon>html/images/google_earth_ico16x16.gif</icon>
+<help_location>%shtml</help_location>
+
+<list>
+
+<listitem>
+<label>Help</label>
+<callback>web(fullfile(googleearthroot,'html','contents.html'),'-helpbrowser')</callback>
+<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+</listitem>
+
+<listitem>
+<label>Matlab Central File exchange</label>
+<callback>web http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=12954 -browser; </callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>Google Earth Home</label>
+<callback>web('http://earth.google.com/','-browser')</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>Google Earth KML 2.1 Reference</label>
+<callback>web('http://code.google.com/apis/kml/documentation/kml_tags_21.html','-browser')</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>VL-e project</label>
+<callback>web('http://www.vl-e.nl/','-browser')</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>Research Group CGE</label>
+<callback>web('http://www.science.uva.nl/ibed-cge','-browser')</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+</list>
+
+</productinfo>

@@ -1,0 +1,10 @@
+TODO:
+- rewrite @packed/trifactor_*, trisolve_*, tricond_* in the way trilin/private/*.c do and using @packed/private/mx2.c
+- replace 
+%!     while true
+%!         n = round(10*rand);
+%!         if (n > 2),  break;  end
+%!     end
+with
+%!     n = 1 + ceil(10*rand);  assert(n >= 2);
+

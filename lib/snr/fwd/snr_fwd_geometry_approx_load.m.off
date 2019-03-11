@@ -1,0 +1,16 @@
+function sfc_approx = snr_fwd_geometry_approx_load (sfc, ant, rec, opt, sett_sfc)
+    switch lower(sfc.approximateit)
+    case {'horiz','horizontal','planar horizontal'}
+        sfc_approx = snr_setup_sfc_geometry_horiz (opt);
+    case {'tilted','planar tilted'}
+        [coeff, slope, aspect, zfit] = planefit (x, y, dem.z(:));
+        %TODO: opt.?
+        sfc_approx = snr_setup_sfc_geometry_tilted (opt);
+    case 'dem'
+        sfc_approx.tilted = snr_fwd_geometry_approx_load (sfc, ant, rec, set(opt, 'approximateit','tilted'));
+        %sfc_approx.sky = ... %TODO: call do_pol2.m
+    otherwise
+        sfc_approx = [];
+    end
+end
+

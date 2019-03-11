@@ -1,0 +1,4 @@
+function x = mldivide (A, b)
+    x = tri_mldivide (A, b);
+end
+
