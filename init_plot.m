@@ -12,10 +12,10 @@ end
 if is_octave()
   mysaveas (false)
   graphics_toolkit('gnuplot')  % lower quality but more reliable
-  %graphics_toolkit('qt')  % better quality but gives errors
+  %graphics_toolkit('qt')  % better quality but may give errors
 end
 
-mysubplot = @(m,n,p) subtightplot(m, n, p, 0.0015, [0.1 0.025], [0.105 0.015]);
+mysubplot = @(m,n,p) subtightplot(m, n, p, 0.0015, [0.125 0.025], [0.125 0.02]);
 myplot = @plotsin;  myxlim = @xlimsin;
 
 %mysubplot = @subplot;  %myplot = @plot;  myxlim = @xlim;
