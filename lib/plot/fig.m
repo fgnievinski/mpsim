@@ -71,7 +71,8 @@ optargin = size(varargin,2);
 if optargin>0
 
 % check if a handle is passed in
-if isscalar(varargin{1}) && isnumeric(varargin{1})
+%if isscalar(varargin{1}) && isnumeric(varargin{1})
+if isscalar(varargin{1}) && (isnumeric(varargin{1}) || isa(varargin{1}, 'matlab.ui.Figure'))
     flag=[flag '1'];
     i=2;
      if ishghandle(varargin{1})==1
