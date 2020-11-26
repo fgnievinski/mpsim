@@ -34,11 +34,11 @@ sett = repmat({sett0}, siz);
 for k=1:num_cases,  sett{k}.sfc.material_bottom = material_grid(k);   end
 for k=1:num_cases,  sett{k}.ant.slope = slope_grid{k};   end
 setup0 = snr_setup(sett0);
-setup  = cell_snr_resetup(sett, setup0);
-result = cell_snr_fwd(setup);
+setup  = snr_resetup(sett, setup0);
+result = snr_fwd(setup);
 
 %%
-if is_octave(),  ogt = graphics_toolkit('fltk');  end
+%if is_octave(),  ogt = graphics_toolkit('fltk');  end
 figure
   if sett0.opt.max_plot,  maximize();  end
   hold on
@@ -66,4 +66,4 @@ figure
     annotation('textbox',[0.63 0.65 0.1 0.1], 'String','Soil',   'Color','g', temp{:})
   end
   mysaveas('figA8')
-  if is_octave(),  graphics_toolkit(ogt);  end
+  %if is_octave(),  graphics_toolkit('ogt');  end

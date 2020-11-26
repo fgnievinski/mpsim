@@ -36,7 +36,7 @@ function [CPN_db, power_loss] = snr_fwd_signal2snr (power_signal, setup, geom, p
     
     if setup.bias.apply_direct_power_bias_only_at_end
         temp = decibel_phasor (phasor_bias_direct, false);
-        if setup.bias.inv_ratio,  temp = -temp;  end
+        if setup.bias.inv_ratio_trend,  temp = -temp;  end
         CPN_db = CPN_db - temp;
     end
 end

@@ -43,8 +43,11 @@ snr_meas_db, setup, pre, return_fits)
     if (nargin < 3),  pre = struct();  end
     if (nargin < 4) || isempty(return_fits),  return_fits = true;  end
     %setup.bias.fit.plotit = true;  % DEBUG
+        
+	%TODO: decibel_which_inv = snr_inv_plot_obs_aux_units ({'db' setup.bias.fit.obs_units});
+    decibel_which_inv = @decibel_power_inv;
     
-    snr_meas = decibel_power_inv(snr_meas_db);
+    snr_meas = decibel_which_inv(snr_meas_db);
     [setup, pre] = snr_fwd_bias_fit_aux2 (setup, pre);
     
     [indep, graz, elev] = snr_bias_indep (setup.bias, setup.sat, setup.pre.geom);
@@ -54,23 +57,42 @@ snr_meas_db, setup, pre, return_fits)
     idx_lim_fringe = elev2idx(setup.bias.fit.elev_lim_fringe);
     
     if ~isfield(pre, 'bias'),  pre.bias = [];  end
+    height_domain = setup.bias.fit.height_domain;
+    if setup.bias.fit.is_height_domain_relative
+        height_domain = mplsqfourier_height (height_domain);
+        if (setup.ref.height_ant == 0)
+            error('snr:fwd_bias_fit:checkHeiDom', ...
+                ['Configuration sett.ref.height_ant=0.0 is not compatible with '...
+                 'sett.bias.fit.is_height_domain_relative=true.'])
+        end
+        if (max(height_domain) > setup.ref.height_ant)
+            warning('snr:fwd_bias_fit:checkHeiDom', ...
+                ['Possible misuse of setup.bias.fit.is_height_domain_relative detected; ' ...
+                 'please check setup.bias.fit.height_domain and/or setup.ref.height_ant.'])
+        end
+        height_domain = height_domain + setup.ref.height_ant;
+    end
+    
     [coeff_direct, coeff_interf, ...
      snr_simul_trend_post, snr_meas_detrended_post, pre.bias] = snr_bias_fit (...
         snr_meas, indep, graz, ...
         pre.snr_simul_trend, pre.snr_simul_trend2, pre.snr_simul, pre.bias, ...
         idx_lim_trend, idx_lim_fringe, ...
         setup.bias.fit.degree_trend, setup.bias.fit.degree_fringe_aux, ...
-        setup.bias.inv_ratio, setup.bias.fit.trend_only, setup.bias.fit.refine_peak, ...
-        setup.bias.fit.height_domain, setup.opt.wavelength, ...
+        setup.bias.inv_ratio_trend, setup.bias.inv_ratio_fringe, ...
+        setup.bias.fit.trend_only, setup.bias.fit.refine_peak, ...
+        height_domain, setup.opt.wavelength, ...
         setup.bias.fit.prefit_trend, setup.bias.fit.postfit_trend, ...
-        setup.bias.fit.plotit, setup.bias.fit.num_obs_min);
-    %TODO: offer height_domain relative to ant height.
+        setup.bias.fit.plotit, setup.bias.fit.num_obs_min, ...
+        setup.bias.fit.do_chirp, setup.bias.heightbias2phaseslope);
     
     sett = setup.sett;
-    sett.bias.height = coeff_interf.height;
     sett.bias.power_direct = coeff_direct;
     sett.bias.phase_interf = coeff_interf.phase;
     sett.bias.power_interf = coeff_interf.power;
+    sett.bias.height = coeff_interf.height;
+    sett.bias.chirp = coeff_interf.chirp;
+    sett.bias.indep_mid = coeff_interf.indep_mid;
     %sett.bias.power_interf = snr_bias_power_default();  % DEBUG
     setup = snr_resetup(sett, setup);
 
@@ -78,14 +100,14 @@ snr_meas_db, setup, pre, return_fits)
     if ~return_fits
         snr_simul_db_post = [];
         snr_simul_detrended_post = [];
-    elseif any(structfun(@(x) isnan(x) || isempty(x), coeff_interf))
+    elseif any(structfun(@(x) isempty(x) || isnan(x), coeff_interf))
         siz = size(snr_meas_db);
         snr_simul_db_post = NaN(siz);
         snr_simul_detrended_post = NaN(siz);
     else
         temp = snr_fwd(setup);
         snr_simul_db_post = temp.snr_db;    
-        snr_simul_post = decibel_power_inv(snr_simul_db_post);    
+        snr_simul_post = decibel_which_inv(snr_simul_db_post);    
         snr_simul_detrended_post = snr_simul_post - snr_simul_trend_post;
     end      
       %figure, hold on, plot(snr_meas_db, '.k'), plot(snr_simul_db_post, '-r')
@@ -96,10 +118,11 @@ function [setup, pre] = snr_fwd_bias_fit_aux2 (setup, pre)
     sett = setup.sett;
     %sett.sat = struct();  % WRONG! would make resetup to discard pre.
     %sett.sat.elev = elev;
-    sett.bias.height = [];
     sett.bias.power_direct = [];
     sett.bias.power_interf = [];
     sett.bias.phase_interf = [];
+    sett.bias.height = [];
+    sett.bias.chirp = [];
     setup = snr_resetup(sett, setup);
     if ~isfield(setup.pre, 'geom'),  setup.pre.geom = [];  end
 
@@ -110,8 +133,8 @@ function [setup, pre] = snr_fwd_bias_fit_aux2 (setup, pre)
     end
     
     setup1 = setup;  setup1.opt.special_fringes = 'disabled';
-    setup2 = setup;  setup2.opt.disable_fringes = 'superior';
-    setup3 = setup;  setup3.opt.disable_fringes = 'common';
+    setup2 = setup;  setup2.opt.special_fringes = 'superior';
+    setup3 = setup;  setup3.opt.special_fringes = 'common';
 
     result1 = snr_fwd(setup1);
     setup2.pre = result1.pre;  

@@ -2,6 +2,8 @@ function [sol, spec, resid, fit, jacob, jacobe] = mplsqfourier_multiple (obsstd,
 height_input, wavelength, num_extra, degree, exclude_height, rms_method, jacobe, refine, method)
 %MPLSQFOURIER: Multipath LSSA, with detailed information about multiple peaks.
 
+%TODO: refactor using lsqfourier_multiple.m
+
     if (nargin < 03),  height_input = [];  end
     if (nargin < 04),  wavelength = [];  end
     if (nargin < 05) || isempty(num_extra),  num_extra = 1;  end
@@ -23,7 +25,7 @@ height_input, wavelength, num_extra, degree, exclude_height, rms_method, jacobe,
     [peak, fit, jacob, colname] = mplsqfourier_multiple_aux (elev, peak1, spec, fit1, ...
         num_extra, degree, exclude_height);
 
-    if iscell(obsstd),  obs = obsstd{1};  else  obs = obsstd;  end
+    if iscell(obsstd),  obs = obsstd{1};  else,  obs = obsstd;  end
     resid = fit - obs;
     resid = zeronan(resid);
 
@@ -45,7 +47,7 @@ end
 % obs, elev, peak, spec, fit, num_extra, degree, exclude_height)
 function [peak, fit, jacob, colname] = mplsqfourier_multiple_aux (...
 elev, peak1, spec, fit1, num_extra, degree, exclude_height)
-    [jacob, colname] = mplsqfourier_design (elev, peak1, degree, exclude_height);
+    [jacob, colname] = mplsqfourier_jacob_peak (elev, peak1, degree, exclude_height);
 
     name = {'amplitude','phase','freq'};
     peak = getfields(peak1, [name, polyname(peak1.poly)]);
@@ -63,7 +65,7 @@ elev, peak1, spec, fit1, num_extra, degree, exclude_height)
                  'increasing the detrending polynomial degree recommended.'])
         end
 
-        [jacobi, colnamei] = mplsqfourier_design (elev, peaki, degreei, exclude_heighti);
+        [jacobi, colnamei] = mplsqfourier_jacob_peak (elev, peaki, degreei, exclude_heighti);
         
         colnamei = strcat(colnamei, num2str(i));
         jacob = horzcat(jacob, jacobi);  %#ok<AGROW>

@@ -1,12 +1,13 @@
 function [istd_scale, itime, idof, istd_inp, istd_obs, istd_avg, iavg] = smoothitud2 (...
 num_params, ...
 time, resid, std, dof, dt, itime, ...
-ignore_self, robustify)
+ignore_self, robustify, std_inp_min)
 %SMOOTHITUD2  Second-order uncertainty-weighted running average, with varying degree of freedom.
 
     if (nargin < 7),  itime = [];  end
     if (nargin < 8),  ignore_self = false;  end
     if (nargin < 9),  robustify = false;  end
+    if (nargin <10),  std_inp_min = [];  end
     
     detrendit = false;
     rigorous_residuals = false;
@@ -15,7 +16,7 @@ ignore_self, robustify)
     [iavg, itime, istd_obs, istd_avg, idof, istd_inp, istd_scale] = smoothitud (...
         time, resid, std, dof, dt, itime, ...
         ignore_self, robustify, detrendit, ...
-        rigorous_residuals, interp_method, idof_method);
+        rigorous_residuals, interp_method, idof_method, std_inp_min);
       
     if isempty(num_params) || (num_params == 1),  return;  end
     num_obs = idof + 1;

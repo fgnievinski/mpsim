@@ -31,7 +31,7 @@ vec_arp_pivot, vec_apc_pivot, sat_epoch, velocity)
         if ~isempty(velocity)
             error('snr:snr_setup_ref:badHeightOffset', ...
                 ['When height offset (sett.ref.height_off) is vectorial, '...
-                 'Vertical velocity (sett.ref.velocity) must be empty.']);
+                 'vertical velocity (sett.ref.velocity) must be empty.']);
         end
         velocity = gradient(height_off, sat_epoch);
     elseif ~isempty(velocity)

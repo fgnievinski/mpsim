@@ -1,10 +1,10 @@
 % unique values and number of duplicates.
-function [out1, out2, m, n] = unique2 (in, varargin)
+function [out1, out2, m, n] = unique2 (inp, varargin)
     %myassert (isvector(in));
-    [out1, m, n] = unique(in, varargin{:});
+    [out1, m, n] = unique(inp, varargin{:});
 
     if (nargout < 2),  return;  end
-    if isempty(in),  out2 = [];  return;  end
+    if isempty(inp),  out2 = [];  return;  end
     
     % n gives the indices to unique values in vector in.
     % we prefer to handle n instead of in because in is always double.
@@ -20,10 +20,10 @@ function [out1, out2, m, n] = unique2 (in, varargin)
     out2 = diff([0; nind]);
     if (nargin > 1)
         out2 = reshape(out2, [size(out1,1) 1]);
-        myassert (sum(out2), size(in,1));
+        myassert (sum(out2), size(inp,1));
     else
         out2 = reshape(out2, size(out1));
-        myassert (sum(out2), length(in));
+        myassert (sum(out2), length(inp));
     end
 end
 

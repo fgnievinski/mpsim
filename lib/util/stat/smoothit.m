@@ -13,6 +13,7 @@ force_row_input_if_scalar)
             'Third and fourth input arguments seem misexchanged in order.')
     end
     if isscalar(xi) && isinf(xi)
+        % special meaning
         xi = linspaceout(min(x), max(x), dx)';
     end
     assert(~islogical(xi))
@@ -33,7 +34,7 @@ force_row_input_if_scalar)
         f = arrayfun2(@(i) @(x,y,xi) f{i}(y), reshape(1:numel(f), size(f)));
     end
     
-    [n, p, ms, yi, f_colvec] = get_sizes (y, xi, f);
+    [n, p, ms, yi, f_colvec] = get_sizes (x, y, xi, f);
     
     if ignore_nans,  idx_notnan = ~anynan(y, 2);  end
     for i=1:n
@@ -81,23 +82,40 @@ force_row_input_if_scalar)
 end
 
 %%
-function [n, p, ms, yi, f_colvec] = get_sizes (y_input, xi, f)
+function [n, p, ms, yi, f_colvec] = get_sizes (x_input, y_input, xi, f)
     n = length(xi);
     p = numel(f);
     ms = NaN(p, 1);
     yi = cell(p, 1);
     q = 10;
-    x_trialn = rand(q,1);
-    x_trial1 = rand(1,1);
-    y_input1 = y_input(1,:);
+    %ind1 = 1;
+    ind1 = find(~isnan(y_input(:,1)),1,'first');
+    if ~isempty(ind1)
+        x_input1 = x_input(ind1,:);
+        y_input1 = y_input(ind1,:);
+    else
+        ind1 = 1;
+        x_input1 = x_input(ind1,:);
+        y_input1 = rand(1, size(y_input,2));
+        y_input1 = ceil(100*y_input1);  % f might require y to be integer
+    end
+    %x_trial1 = rand(1,1);
+    %x_trialn = rand(q,1);
     %%y_trial1 = rand(1,size(y_input,2));
     %%y_trialn = rand(q,size(y_input,2));
+    % reuse parts of x_input as function f might be non-conditioned otherwise:
+    x_trial1 = x_input1;
+    x_trialn = repmat(x_trial1, [q 1]);
+    x_trialn = bsxfun(@times, (1:q)', x_trialn);  % avoid warning 'MATLAB:illConditionedMatrix'
     % reuse parts of y_input as function f might require it to be integer:
     y_trial1 = y_input1;
-    y_trialn = repmat(y_trial1, [q 1]);
-    % avoid error 'stats:robustfit:NotEnoughData'
-    y_trialn = bsxfun(@times, (1:q)', y_trialn);
+    y_trialn = repmat(y_trial1, [q 1]);    
+    y_trialn = bsxfun(@times, (1:q)', y_trialn);  % avoid error 'stats:robustfit:NotEnoughData'
     f_colvec = false(p, 1);
+    warn0 = warning('off', 'MATLAB:singularMatrix');
+    warn1 = warning('off', 'MATLAB:nearlySingularMatrix');
+    warn2 = warning('off', 'MATLAB:illConditionedMatrix');
+    warn3 = warning('off', 'MATLAB:polyfit:PolyNotUnique');    
     for k=1:p
         out = f{k}(x_trialn,y_trialn,0);
         ms(k) = length(out);
@@ -107,10 +125,17 @@ function [n, p, ms, yi, f_colvec] = get_sizes (y_input, xi, f)
             f_colvec(k) = (length(out1) == ms(k));
         catch err
             if ~strcmp(err.identifier, 'stats:robustfit:NotEnoughData')
+                warning(warn0)
+                warning(warn1)
+                warning(warn2)
                 rethrow(err)
             end
         end
     end
+    warning(warn0)
+    warning(warn1)
+    warning(warn2)
+    warning(warn3)
 end
 
 %%

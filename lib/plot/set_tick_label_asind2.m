@@ -7,7 +7,7 @@ function set_tick_label_asind2 (XY, format, etick, eticktolabel, elim, fnc)
     if (nargin < 6) || isempty(fnc),  fnc = @sind;  end
     
     if isscalar(etick),  etick = elim(1):etick:elim(2);  end
-    if ischar(eticktolabel),  switch lower(eticktolabel)
+    if ischar(eticktolabel),  switch lower(eticktolabel) %#ok<ALIGN>
     case 'full',  eticktolabel = [0 5 10 15 20 30 45 60 90];
     case 'wide',  eticktolabel = 0:15:90;
     case 'avg',   eticktolabel = [0:10:60,90];

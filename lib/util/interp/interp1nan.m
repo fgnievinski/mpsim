@@ -1,15 +1,4 @@
-function varargout = interp1nan (x, y, varargin)
-    idx = isnan(x);% | isnan(y);
-    x(idx) = [];
-    if ~isvector(y),  assert(size(y,1) == numel(x));  end
-    y(idx,:) = [];
-    s1 = warning('off', 'MATLAB:interp1:NaNinY');
-    s2 = warning('off', 'MATLAB:chckxy:IgnoreNaN');    
-    s3 = warning('off', 'MATLAB:interp1:NaNstrip');
-    [varargout{1:nargout}] = interp1 (x, y, varargin{:});
-    warning(s1);
-    warning(s2);
-    warning(s3);
+% (this is just an interface)
+function varargout = interp1nan (varargin)
+    [varargout{1:nargout}] = interp1nanx (varargin{:});
 end
-
-

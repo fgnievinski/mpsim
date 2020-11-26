@@ -16,7 +16,9 @@ line_style, band_color, band_transparency, single_point_dx, edge_color)
 
     [l, u] = std2lu (e, x);
   
-    idx = ( isnan(x) | isnan(y) | isnan(l) | isnan(u) );
+    %idx = ( isnan(x) | isnan(y) | isnan(l) | isnan(u) );
+    idx = ( ~isfinite(x) | ~isfinite(y) | ~isfinite(l) | ~isfinite(u) );
+    
     if any(idx)
         h_band = errorband_nan (idx, x, y, l, u, band_color, single_point_dx);
     else
@@ -45,7 +47,7 @@ function h_band = errorband_nan (idx, x, y, l, u, band_color, single_point_dx)
     ind = [0; ind; numel(x)+1];
     ind4 = [];
     h_band = [];
-    t = median(diff(x));
+    t = nanmedian(diff(x));
     dt = [-1,+1]*t*single_point_dx;
     for i=1:numel(ind)-1
         ind1 = ind(i)+1;

@@ -8,6 +8,9 @@ pos_geod, elev_ang, azimuth, ell)
         ell = get_ellipsoid('sphere');
     end
     dist = ones(size(elev_ang));
+    if isscalar(azimuth) && isvector(elev_ang)
+        azimuth = repmat(azimuth, size(elev_ang));
+    end
     dir_local_sph = [elev_ang azimuth dist];
     dir_global_cart = convert_from_local_sph (dir_local_sph, pos_geod, ell, true);
 end

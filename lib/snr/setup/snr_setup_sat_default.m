@@ -6,8 +6,8 @@ function sat = snr_setup_sat_default (num_obs, epoch_lim, azim_lim, elev_lim, re
     if (nargin < 5) || isempty(regular_in_sine),  regular_in_sine = true;  end
     
     if isscalar(epoch_lim),  epoch_lim = [epoch_lim, epoch_lim];  end
-    if isscalar(azim_lim),  azim_lim = [azim_lim, azim_lim];  end
-    if isscalar(elev_lim),  elev_lim = [elev_lim, elev_lim];  end
+    if isscalar(azim_lim),   azim_lim  = [azim_lim, azim_lim];    end
+    if isscalar(elev_lim),   elev_lim  = [elev_lim, elev_lim];    end
     
     epoch = linspace(epoch_lim(1), epoch_lim(2), num_obs)';
     azim  = linspace( azim_lim(1),  azim_lim(2), num_obs)';

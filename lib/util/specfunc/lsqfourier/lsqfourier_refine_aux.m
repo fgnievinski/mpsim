@@ -15,13 +15,15 @@ peak, fit, resid, jacob, colname)
     
     if (nargout < 2),  return;  end
     resid_orig = resid;
-    resid = resid + y;
+    resid = resid_orig + y;
     %resid = resid - y;  % WRONG!
     %assert(nanrmse(resid) <= nanrmse(resid_orig))
     if (nanrmse(resid) > nanrmse(resid_orig))
         warning('matlab:lsqfourier:refine:bad', ...
           'Deterioration upon refinment detected.');
     end
-    fit = fit - y;
+    fit_orig = fit;
+    fit = fit_orig + y;
+    %fit = fit - y;  % WRONG!
     %fit = eval_sinusoid (peak.amplitude, peak.phase, peak.freq, sine);  % WRONG! ignores poly.
 end

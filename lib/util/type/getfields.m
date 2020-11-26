@@ -1,8 +1,9 @@
 function s2 = getfields (s, f2, return_non_existent, algorithm)
+    algorithm_default = 2;
     if isempty(s) && ~isstruct(s),  s = struct();  end
     was_cell = true;  if ~iscell(f2),  f2 = {f2};  was_cell = false;  end
     if (nargin < 3) || isempty(return_non_existent),  return_non_existent = false;  end
-    if (nargin < 4) || isempty(algorithm),  algorithm = 1;  end
+    if (nargin < 4) || isempty(algorithm),  algorithm = algorithm_default;  end
     switch algorithm
     case 1
         s2 = getfields1 (s, f2, return_non_existent);
@@ -14,6 +15,7 @@ end
 
 function s2 = getfields1 (s, f2, return_non_existent)
     s2 = struct();
+    f1 = fieldnames(s);
     for i=1:numel(f2)
         try
             s2.(f2{i}) = s.(f2{i});

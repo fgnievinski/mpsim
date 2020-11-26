@@ -1,18 +1,22 @@
 function data = snr_setup_ant_offset_load (data_dir, filename)
     if (nargin < 1) || isempty(data_dir),  data_dir = snr_setup_ant_path();  end
     if (nargin < 2) || isempty(filename),  filename = 'antenna_offset.txt';  end
-    persistent data0 data_dir0 filename0
-    if ~isempty(data0) && all(strcmp({data_dir filename}, {data_dir0 filename0}))
+    filepath = fullfile(data_dir, filename);
+    
+    persistent data0 filepath0 moddate0
+    if ~isempty(data0) && strcmp(filepath0, filepath) ...
+    && strcmp(moddate0, getfield(dir(filepath), 'date'))
         data = data0;
         return;
     end
-    data = snr_setup_ant_offset_load_aux (data_dir, filename);
+    
+    data = snr_setup_ant_offset_load_aux (filepath);
     data0 = data;
-    data_dir0 = data_dir;
-    filename0 = filename;
+    filepath0 = filepath;
+    moddate0 = getfield(dir(filepath), 'date');
 end
-function data = snr_setup_ant_offset_load_aux (data_dir, filename)
-    filepath = fullfile(data_dir, filename);
+
+function data = snr_setup_ant_offset_load_aux (filepath)
     [fid, msg] = fopen(filepath, 'r');
     if (fid == -1)
         error('MATLAB:couldNotReadFile', ...

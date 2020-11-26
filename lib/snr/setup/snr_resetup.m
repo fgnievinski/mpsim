@@ -117,6 +117,9 @@ function [setup, what_changed] = snr_resetup_aux (sett, setup)
         what_changed{end+1} = 'ref';
         setup.ref = snr_setup_origin (sett.ref, ...
             setup.ant.vec_apc_arp_upright, setup.ant.rot, setup.sat.epoch);
+        if iseq(setup.ref, setup.ref)
+            what_changed(end) = [];  % it didn't change after all.
+        end
     end
     %[sett, sett_old, return_now] = snr_resetup_aux2 (sett, sett_old, 'ref');
     %if return_now,  return;  end  % WRONG! ant, ref, sfc are inter-twined.

@@ -1,10 +1,11 @@
 function [std_obs, std_mean, std_scale, std_obs_prior, num, wmean] = nanstdur (varargin)
 %NANSTDU  Uncertainty-weighted standard deviations, robust against outliers, ignoring NaNs.
 % 
-% std_obs: standard uncertainty of observations (scaled)
-% std_mean: standard uncertainty of the mean (scaled)
-% std_scale: square-root of reduced chi-squared
-% std_obs_prior: typical input or a priori standard uncertainty of observations
+% Output:
+%  std_obs: standard uncertainty of observations (scaled)
+%  std_mean: standard uncertainty of the mean (scaled)
+%  std_scale: square-root of reduced chi-squared statistic or a-posteriori variance factor
+%  std_obs_prior: typical input or a-priori standard uncertainty of observations
 
     [wmean, num, std_mean_unscaled, std_scale, std_obs_prior] = nanmeanur (varargin{:});
     std_mean = std_mean_unscaled .* std_scale;

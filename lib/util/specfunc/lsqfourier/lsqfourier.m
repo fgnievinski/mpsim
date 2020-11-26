@@ -58,7 +58,7 @@ period, degree, opt, J, return_fits)
 %    opt: options
 %      opt.method: [char] estimation method ('')
 %        opt.method = 'simultaneous' or 'in context': all trial tones together
-%        opt.method = 'independent' or 'out of context': all trial tones, one at a time
+%        opt.method = 'independent' or 'out of context': all trial tones, one at a time (default)
 %        opt.method = 'iterated': leading tones only, one tone at a time, applied to residuals
 %        opt.method = 'complete': 'iterated' followed by 'simultaneous'
 %      opt.tol: [scalar] tolerance for stopping iterated
@@ -79,6 +79,7 @@ period, degree, opt, J, return_fits)
 %      if opt.method = 'iterated': fit3 with the cumulative sum of ordered leading tones.
 %      otherwise: fit3 is a NaN matrix.
 %    J: [matrix] Jacobian; it can be reused for a same period vector.
+% - Terminology: a "tone" is synonym with a sinusoid of constant frequency, phase-shift, and amplitude.
 % 
 % For background, see section 1.9, "Fourier Series as Least-Squares" in 
 % Prof. Wunsch's "Inference from Data and Models" lecture notes, 
@@ -109,8 +110,8 @@ period, degree, opt, J, return_fits)
     if isempty(return_fits),  return_fits = true;  end
     if (nargout < 3),  return_fits = false;  end
     
-    %% call auxiliary function:
-    [coeff, fit2, J, period, degree, opt] = lsqfourier_aux (obs, time, period, degree, opt, J);
+    %% call auxiliary function to do the main work:
+    [coeff, fit2, J, period, degree, opt, input_iscolvec] = lsqfourier_aux (obs, time, period, degree, opt, J);
     
     %% get power and phase of complex-valued spectral components:
     spec = struct();
@@ -133,6 +134,7 @@ period, degree, opt, J, return_fits)
     if iscell(obs),  obs = obs{1};  end
     %[trend, peak.poly] = nanpolyfitval(time, obs, degree);
     [trend, poly, ~, ~] = nanpolyfitval(time, obs, degree);  % allow time centering & scaling
+    peak.poly = poly;
     peak = structmerge(peak, poly2struct(poly));
 
     %% calculate predicted observations:
@@ -141,10 +143,11 @@ period, degree, opt, J, return_fits)
     if (nargout < 5) || ~return_fits,  fit3 = [];  return;  end
     fit3 = NaN(size(fit2));
     if any(strcmpi(opt.method, {'iterated', 'iterative', 'iteratively'}))
-        fit2 = minus_all(fit2, trend);
+        trend2 = trend;  if ~input_iscolvec,  trend2 = trend2';  end
+        fit2 = minus_all(fit2, trend2);
         fit3 = cumsum(fit2(:,spec.order), 2);
         fit3 = fit3(:,spec.order_inv);
-        fit3 = plus_all(fit3, trend);
-        fit2 = plus_all(fit2, trend);
+        fit3 = plus_all(fit3, trend2);
+        fit2 = plus_all(fit2, trend2);
     end
 end

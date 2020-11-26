@@ -1,6 +1,6 @@
 function num = mydatenum (vec, is_diff)
-%MYDATENUM: Convert from vector parts (to internal epoch format).
-% Intented to give more resolution to epoch units, for near-current epochs.
+%MYDATENUM: Convert from vector parts (to internal epoch number).
+% Intended to give more resolution for near-current epochs.
     if (nargin < 2),  is_diff = [];  end
     m = size(vec,2);
     if isempty(vec)

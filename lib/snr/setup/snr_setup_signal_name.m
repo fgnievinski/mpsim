@@ -128,6 +128,9 @@ gnss_name, freq_name, channel, block_name, code_name, subcode_name)
         case 'L5',  subcode_name = 'Q';
         end
     end
+    if strcmpi(gnss_name, 'GPS')
+        [code_name, subcode_name] = get_gps_synonym (code_name, subcode_name, freq_name);
+    end
     if isempty(block_name)
         switch upper(freq_name)
         case 'L1',  block_name = 'IIR';

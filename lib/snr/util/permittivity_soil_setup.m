@@ -1,4 +1,5 @@
 function out = permittivity_soil_setup (filename_real, filename_imag, data_dir)
+% See also: permittivity_soil_plot
   if (nargin < 1),  filename_real = 'soil_re.dat';  end
   if (nargin < 2),  filename_imag = 'soil_im.dat';  end
   if (nargin < 3)

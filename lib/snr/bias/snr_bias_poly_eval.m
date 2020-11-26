@@ -11,7 +11,7 @@ function [bias, jacob] = snr_bias_poly_eval (coeff, indep, return_scalar)
         otherwise,  % don't return;
         end
     end
-    coeff = flipdim(coeff,2);  % (consistent with snr_bias_poly_fit):
+    coeff = flip(coeff,2);  % (consistent with snr_bias_poly_fit):
     if (size(coeff,1) == numel(indep)) || isscalar(indep) || return_jacob
         [bias, jacob] = polyval1m(coeff, indep);
         jacob = flipdim(jacob,2);

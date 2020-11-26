@@ -4,7 +4,7 @@ iavg, itime, istd_obs, istd_avg, idof, istd, istd_scale, ...
 get_jacob, extra, ...
 time, obs, std, dof, dt, itime, ...
 ignore_self, robustify, detrendit, ...
-rigorous_residuals, interp_method, idof_method)
+rigorous_residuals, interp_method, idof_method, std_inp_min)
 %SMOOTHITUP  Uncertainty-weighted running adjustment (with non-trivial Jacobian).
 
 % Note: the function handle get_jacob outputs the Jacobian matrix and has
@@ -21,10 +21,14 @@ rigorous_residuals, interp_method, idof_method)
   if (nargin < 12) || isempty(rigorous_residuals),  rigorous_residuals = true;  end
   if (nargin < 13) || isempty(interp_method),  interp_method = 'linear';  end
   if (nargin < 14),  idof_method = [];  end
+  if (nargin < 15),  std_inp_min = [];  end
   if isscalar(robustify),  robustify(2) = true;  end
 
   [std, dof, dof_original] = smoothitudc_dof (std, dof); %#ok<ASGLU>
+  % avoid unrealistically small std., that would result is exceedingly large weights:
+  if ~isempty(std_inp_min),  std = max(std, std_inp_min);  end
 
+  obs(isnan(std)) = NaN;
   in = [obs, std, extra];
   
   wrapper2 = @(varargin) wrapper(varargin{:}, get_jacob, robustify(1));
@@ -134,7 +138,19 @@ end
 function [x, C, e] = linsolver (s, J, y)
   [J2, y2] = linsolve_pre (s, J, y);
   warn = warning('off', 'stats:statrobustfit:IterationLimit');
-  [x, stats] = robustfit (J2, y2, [], [], 'off');
+  try
+    [x, stats] = robustfit (J2, y2, [], [], 'off');
+  catch err
+    if strcmp(err.identifier, 'stats:robustfit:NotEnoughData')
+        [n,m] = size(J);
+        x = NaN(m,1);
+        C = NaN(m,m);
+        if (nargin < 3),  return;  end
+        e = NaN(n,1);
+        warning(warn)
+        return;
+    end
+  end
   warning(warn)
   C = stats.covb ./ stats.s^2;
   n = numel(x);  if ~isequal(size(C), [n n]),  C = NaN(n,n);  end
@@ -146,7 +162,11 @@ function [x, C, e] = linsolve (s, J, y)
   [J2, y2] = linsolve_pre (s, J, y);
   u = J2'*y2;
   N = J2'*J2;
+  %warn = warning('off', 'MATLAB:nearlySingularMatrix');
   C = inv(N);
+  %[~, warn_id] = lastwarn();
+  %if strcmp(warn_id, 'MATLAB:nearlySingularMatrix'),  keyboard();  end
+  %warning(warn)
   x = C * u; %#ok<MINV>  % we need C.
   %x = J \ y;
   e = linsolve_post (x, J, y);

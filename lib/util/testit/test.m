@@ -282,7 +282,8 @@ function test (varargin)
         catch %#ok<CTCH>
             s = lasterror; %#ok<LERR>
             idx = strcmp({s.stack.name}, mfunc);
-            if strcmp(test_type, 'priv_func') && any(idx)
+            %if strcmp(test_type, 'priv_func') && any(idx)
+            if strcmp(test_type, 'priv_func') && (sum(idx)==1)
                 s.stack(idx).file = mfile;  % it needs full path
             end
             type(which(tfunc));

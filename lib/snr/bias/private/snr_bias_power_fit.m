@@ -1,21 +1,22 @@
-function coeff = snr_bias_power_fit (power, indep, degree, prefit, varargin)
+function coeff = snr_bias_power_fit (power, indep, degree, doprefit, varargin)
     if (nargin < 2),  indep = [];  end
     if (nargin < 3),  degree = [];  end
-    if (nargin < 4) || isempty(prefit),  prefit = true;  end
+    if (nargin < 4) || isempty(doprefit),  doprefit = true;  end
     if isempty(indep) && ~isempty(power)
         assert(degree == 0 || isnan(degree))
         indep = NaN(size(power));
     end
     
     %degree = NaN;  % DEBUG
-    db = snr_bias_power_prefit (power, indep, degree, prefit);
+    db = snr_bias_power_prefit (power, indep, degree, doprefit);
     coeff = snr_bias_poly_fit (db, indep, degree);
     if isempty(coeff),  coeff = snr_bias_power_default();  end
 end
 
-function db = snr_bias_power_prefit (power, indep, degree, prefit)
+function db = snr_bias_power_prefit (power, indep, degree, doprefit)
+    % (prefit is a quick observation quality control prior to the fit)
     %prefit = false;  % DEBUG
-    if ~prefit || (~isempty(degree) && isnan(degree))
+    if ~doprefit || (~isempty(degree) && isnan(degree))
         db = decibel_power(power);
         return
     end      

@@ -33,7 +33,7 @@ function sett = snr_settings ()
 %     if you wish to have the simulation generate uniformly spaced directions, set the following fields instead:
 %      .num_obs: [scalar] Number of observations (count)
 %      .elev_lim: [vector] satellite elevation angle limits; min, max (in degrees)
-%      .azim_lim: [vector] satellite azimuth limits; min, max (in degrees)
+%      .azim_lim: [vector] satellite azimuth limits; min, max (in degrees, clockwise from north)
 %      .epoch_lim: [vector] satellite observation epoch limits; min, max (in seconds)
 %      .regular_in_sine: [scalar] Generate directions regularly spaced in sine of elevation angle? False means regularly spaced in elevation angle itself. (logical/Boolean)
 % 
@@ -53,7 +53,7 @@ function sett = snr_settings ()
 %      .block_name: [char] Satellite block ('II', 'IIA', 'IIR', 'IIR-M', 'IIF')
 %      .incid_polar_power: [scalar] Incident polarimetric power, LHCP over RHCP (in watts-per-meter-squared over watts-per-meter-squared; real-valued)
 %      .incid_polar_phase: [scalar] Incident polarimetric phase, LHCP minus RHCP (in degrees)
-%      .special_fringes: [char] Force special type of fringes? ('common','disabled','superior','inferior'); 'disabled' means simulate only the trend.
+%      .special_fringes: [char] Force special type of fringes? ('common','disabled','superior','inferior'); 'common' means ordinary simulation; 'disabled' means simulate only the trend.
 %      .disable_incident_power_trend: [scalar] Assume elevation angle independent incident power? (logical/Boolean)
 %      .disable_tracking_loss: [scalar] Disable P(Y) tracking losses? (logical/Boolean); see snr_fwd_tracking_loss.m for details.
 %      .extrap_tracking_loss: [scalar] Extrapolate P(Y) tracking-loss empirical data? (logical/Boolean)

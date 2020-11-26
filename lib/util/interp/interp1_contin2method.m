@@ -15,7 +15,7 @@ function method = interp1_contin2method (contin)
         % textbook, available at <http://www.mathworks.com/moler/interp.pdf>.
     otherwise
         error('raytracer:interp1_contin2method:badInput', ...
-            'Bad value for contin; should be any of 0, 1, or 3.');
+            'Bad value for contin; should be any of 0, 1, 2.5, or 3.');
     end
 end
 

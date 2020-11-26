@@ -1,13 +1,13 @@
 A GNSS MULTIPATH SIMULATOR FOR NEAR-SURFACE 
 REFLECTOMETRY AND POSITIONING APPLICATIONS.
 
-Nievinski, F.G. and Larson, K.M. (2014)
+   Nievinski, F.G. and Larson, K.M. (2014)
    "Forward modeling of GPS multipath for near-
    surface reflectometry and positioning 
    applications", GPS Solut., 18(2):309-322.
    <http://doi.org/10.1007/s10291-013-0331-y>
 
-Nievinski, F.G. and Larson, K.M. (2014)
+   Nievinski, F.G. and Larson, K.M. (2014)
    "An open source GPS multipath simulator 
    in Matlab/Octave", GPS Solut., 18(3):473-481.
    <http://doi.org/10.1007/s10291-014-0370-z>
@@ -22,7 +22,7 @@ Nievinski, F.G. and Larson, K.M. (2014)
     1.B) Alternatively, if running Octave (where 
     drag/drop may not be available), enter:
 
-        run('~/mpsim/init.m')
+        run ~/mpsim/init.m
 
     modifying the ~ path to reflect your install.
     Furthermore, for greater Matlab compatibility, 
@@ -32,9 +32,12 @@ Nievinski, F.G. and Larson, K.M. (2014)
     1.C) In Octave, you might want to try different
     graphics toolkits availabe -- it's a tradeoff 
     between quality and reliability:
-       graphics_toolkit('gnuplot')
        graphics_toolkit('qt')
+       %graphics_toolkit('gnuplot')
 
+    1.D) In Octave, load the statistics package 
+    that comes pre-installed:
+       pkg load statistics
 
 2) The simplest simulation run can be achieved 
 entering the following command:
@@ -42,7 +45,7 @@ entering the following command:
     snr_fwd
 
 
-3) Usage examples: available in sub-directory 
+3) Usage examples are available in sub-directory 
 "script", which contains driver scripts named 
 after each figure in the articles above.
 

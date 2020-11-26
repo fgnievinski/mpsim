@@ -20,8 +20,12 @@ function [code_name, subcode_name] = get_gps_synonym (code_name, subcode_name, f
         end
         code_name = 'L1C';
     case {'L2C','L2S','L2L','L2X'}
-        if ~strcmpi(code_name, 'L2C')
-            subcode_name = code_name(3);
+        if isempty(subcode_name)
+            switch code_name
+            case 'L2S',  subcode_name = 'CM';
+            case 'L2L',  subcode_name = 'CL';
+            otherwise,   subcode_name = 'X';
+            end
         end
         code_name = 'L2C';
     case {'L5','L5I','L5Q','L5X'}

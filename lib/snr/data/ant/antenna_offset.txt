@@ -1,7 +1,7 @@
 % APC-to-ARP offset, i.e., offset of the antenna phase center (APC) relative to the antenna reference point (ARP)
-% First find out your antenna code, consulting the IGS naming conventions at <ftp://igscb.jpl.nasa.gov/pub/station/general/rcvr_ant.tab>.
-% Then find the offset consulting <ftp://igscb.jpl.nasa.gov/pub/station/general/igs08.atx>, 
-% whose format is described in <ftp://igscb.jpl.nasa.gov/pub/station/general/antex14.txt>:
+% First find out your antenna code, consulting the IGS naming conventions at <ftp://igs.org/pub/station/general/rcvr_ant.tab>.
+% Then find the offset consulting <ftp://ig.org/pub/station/general/igs14.atx>, 
+% whose format is described in <ftp://igs.org/pub/station/general/antex14.txt>:
 % |NORTH / EAST / UP   | Receiver antenna:                        | 3F10.2,30X |
 % |                    |  Eccentricities of the antenna phase     |            |
 % |                    |  center relative to the antenna reference|            |
@@ -40,3 +40,4 @@ AOAD/M_T        NONE  L1   0.58     -0.37     91.85
 AOAD/M_T        NONE  L2  -0.08     -0.59    120.35
 NOV702GG        NONE  L1  +1.35     +0.30    +66.76
 NOV702GG        NONE  L2  +0.00     +0.13    +66.08
+CHI_GPS01       NONE  L1  0.0 0.0 0.0

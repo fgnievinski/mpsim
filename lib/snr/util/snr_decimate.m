@@ -54,12 +54,26 @@ function [indib, india] = snr_decimate_ind (var, vari)
         indib = [];
         return
     end
+    
     indi = naninterp1(varu, ind, vari, 'nearest', NaN);
+    %indil= naninterp1(varu, ind, vari, 'linear', NaN);
+    % we do nearest neighbor interpolation to keep observations unaltered 
+    % and also because azimuth would require special treatment (azimuth_interp.m)
 
-    [india, indib] = unique(indi);
-    idx = isnan(india);
-    india(idx) = [];
-    indib(idx) = [];
+    % avoid duplicating observations:
+    % while also avoiding returning an observation which is too distant
+    %[india, indib] = unique(indi);
+    %idx = isnan(india);  india(idx) = [];  indib(idx) = [];
+    [india1, indib1] = unique(indi, 'first');
+    [india2, indib2] = unique(indi, 'last');
+    idx = isnan(india1);
+    idx = idx | (indib1~=indib2);
+    india1(idx) = [];  indib1(idx) = [];
+    india2(idx) = [];  indib2(idx) = [];
+    assert(isequal(india1, india2));
+    assert(isequal(indib1, indib2));
+    india = india1;
+    indib = indib1;
 end
 
 %%

@@ -35,7 +35,7 @@ figure
   ylabel('Reflection polarimetric ratio (dB)')
   %axis tight
   grid on
-  h=legend(num2str(moist*100, '%.0f%%'), 'Location','NorthWest');
+  h=legend(num2str(moist(:)*100, '%.0f%%'), 'Location','NorthWest');
   myxlim(elev_lim)
   ylim([-1 +1]*50)
   mysaveas('figA6')

@@ -3,6 +3,9 @@ function ant = snr_setup_ant (sett_ant, freq_name, channel, ignore_vec_apc_arp)
     if isempty(ant.radome),  ant.radome = 'NONE';  end
     ant.radome = upper(ant.radome);
     ant.model = upper(ant.model);
+    if ~isfieldempty(ant, 'antenna')
+        error('snr:setup_ant:badField', 'Bad field "sett.ant.antenna"; please use "sett.ant.model" instead.');
+    end
     
     ant.model = snr_setup_ant_synonym (ant.model);
     ant = snr_setup_ant_char (ant);

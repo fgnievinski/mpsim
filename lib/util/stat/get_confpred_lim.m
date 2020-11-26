@@ -1,6 +1,6 @@
 function [lim, conf] = get_confpred_lim (avg, se, dof, conf, tail, ...
 output_obs_or_mean, input_obs_or_mean, multiple_correction_type, num_comparisons)
-%GET_CONFPRED_LIM  Confidence or prediction interval, for a new observation or its mean.
+%GET_CONFPRED_LIM  Confidence or prediction interval, for a new observation or for the mean.
 % 
 %  See also GET_VAR_LIM.
 
@@ -45,8 +45,7 @@ output_obs_or_mean, input_obs_or_mean, multiple_correction_type, num_comparisons
     case 'right',  lim = [lim, +Inf(size(lim))];
     case 'left',   lim = [-Inf(size(lim)), lim];
     %case 'left',   lim = [zeros(size(lim)), lim];  % WRONG!
-    case 'max',  lim = max(dlim, [], 2);
-    case 'both',  % do nothing else.
+    case {'both','two','max'}  % do nothing else; see get_prob.m for details.
     end
     
     if (dim_avg ~= 1) || (dim_se ~= 1),  lim = lim.';  end

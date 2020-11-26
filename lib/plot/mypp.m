@@ -1,13 +1,24 @@
-function varargout = mypp (azim_or_zen, val, m, l, c, valc, valo, varargin)
+function varargout = mypp (ang, val, m, l, c, valc, valo, varargin)
+%MYPP: Polar plot.
+% 
+% Input:
+%   ang: azimuth or zenithal angle
+%   val: data value
+%   m: marker
+%   l: line style
+%   c: line color
+%   valc: value at center
+%   valo: value at outer periphery
+
   if (nargin < 2) || isempty(val),  val = 1;  end
   if (nargin < 3) || isempty(m),  m = '.';  end
   if (nargin < 4) || isempty(l),  l = '-';  end
   if (nargin < 5) || isempty(c),  c = 'k';  end
   if (nargin < 6) || isempty(valc),  valc = 0;  end  % center
   if (nargin < 7) || isempty(valo),  valo = max(val);  end  % outer
-  if isscalar(val),  val = repmat(val, size(azim_or_zen));  end
+  if isscalar(val),  val = repmat(val, size(ang));  end
   if ischar(valc) && strcmpi(valc, 'min'),  valc = min(val);  end
-  [varargout{1:nargout}] = pp (azim_or_zen*pi/180, val, ...
+  [varargout{1:nargout}] = pp (ang*pi/180, val, ...
     'ThetaDirection','cw', ...
     'ThetaStartAngle',+270, ...
     ...%'MaxValue',temp1, ...

@@ -1,7 +1,7 @@
 function p = rfitslm (x, y)
 %RFITSLM: Robust fit of simple linear regression model.
 % 
-% SEE ALSO: polyfit.
+% SEE ALSO: polyfit, nanrfitslm.
 
     s = rslope (x, y);  % robust slope
     r = y - s*x;  % residuals (preliminary)

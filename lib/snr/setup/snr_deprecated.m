@@ -25,7 +25,9 @@ function sett = snr_deprecated (sett, list)
         
         msg1 = sprintf('Deprecated syntax "%s"', oldnamei);
         if isempty(newnamei)
-            msg2 = ';\nplease remove non-empty value.';
+            msg2a = ' (no equivalent setting exists)';
+            msg2b = ';\nplease remove non-empty value.';
+            msg2 = [msg2a msg2b];            
             fnc = @error;
         elseif isempty(newvali) ...
         || ( isstruct(oldvali) && isstruct(oldvali) )
@@ -33,8 +35,9 @@ function sett = snr_deprecated (sett, list)
             fnc = @warning;
         else
             msg2a = ';\nplease remove non-empty value ';
-            msg2b = sprintf('and/or use "%s" instead.', newnamei);
-            msg2 = [msg2a msg2b];
+            msg2b = sprintf('and/or use "%s" instead', newnamei);
+            msg2c = ' (conflicting contents).';
+            msg2 = [msg2a msg2b msg2c];
             fnc = @error;
         end
         msg = [msg1 msg2];
@@ -101,7 +104,7 @@ end
 function list = get_list2 ()
     old = {};
     new = {};
-    opt = [];  % is the new name and optional field?
+    opt = [];  % is the new name an optional field?
     fnc = {};
     
     old{end+1} = 'sett.po';
@@ -160,6 +163,11 @@ function list = get_list2 ()
     fnc{end+1} = [];
     
     old{end+1} = 'sett.opt.ant_height_above_sfc';
+    new{end+1} = 'sett.ref.height_ant';
+    opt(end+1) = false;
+    fnc{end+1} = [];
+    
+    old{end+1} = 'sett.opt.height_ant';
     new{end+1} = 'sett.ref.height_ant';
     opt(end+1) = false;
     fnc{end+1} = [];
@@ -422,19 +430,33 @@ function list = get_list2 ()
     fnc{end+1} = [];
     
     old{end+1} = 'sett.opt.max_fringes';
-    new{end+1} = 'sett.opt.fringes_type';
+    new{end+1} = 'sett.opt.special_fringes';
     opt(end+1) = true;
     fnc{end+1} = @(max_fringes) iif(max_fringes, 'superior', []);
     
     old{end+1} = 'sett.opt.disable_fringes';
-    new{end+1} = 'sett.opt.fringes_type';
+    new{end+1} = 'sett.opt.special_fringes';
     opt(end+1) = true;
     fnc{end+1} = @(disable_fringes) iif(disable_fringes, 'disable', []);
+    
+    old{end+1} = 'sett.opt.fringes_type';
+    new{end+1} = 'sett.opt.special_fringes';
+    opt(end+1) = true;
+    fnc{end+1} = [];
+    
+    old{end+1} = 'sett.opt.fringes_type';
+    new{end+1} = 'sett.opt.special_fringes';
+    opt(end+1) = true;
+    fnc{end+1} = [];
+    
+    old{end+1} = 'sett.bias.inv_ratio';
+    new{end+1} = 'sett.bias.inv_ratio_fringe';
+    opt(end+1) = true;
+    fnc{end+1} = [];
     
     list = struct();
     list.old = old;  % old syntax
     list.new = new;  % new syntax
-    list.opt = opt;  % is it optional?
+    list.opt = opt;  % is the new name an optional field?
     list.fnc = fnc;  % non-empty for non-trivial conversion.
 end
-

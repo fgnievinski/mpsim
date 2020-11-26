@@ -3,6 +3,7 @@ function R = get_radius_gaussian (lat, ell)
 
     M = get_radius_meridional (lat, ell);
     N = get_radius_normal     (lat, ell);
+
     R = sqrt(M.*N);
 end
 

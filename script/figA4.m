@@ -20,8 +20,8 @@ siz = [num_cases 1];
 sett = repmat({sett0}, siz);
 for k=1:num_cases,  sett{k}.sfc.height_std = roughness_domain(k);   end
 setup0 = snr_setup(sett0);
-setup  = cell_snr_resetup(sett, setup0);
-result = cell_snr_fwd(setup);
+setup  = snr_resetup(sett, setup0);
+result = snr_fwd(setup);
 
 %%
 for k=1:num_cases

@@ -97,9 +97,12 @@ if ~isempty(h) % UISTACK2(H,STACKOPT) or  % UISTACK2(H,STACKOPT,STEP)
        
         try
         
-            setappdata(0,'uistack2undodata',[temp [p;children_handles]]);
+            %setappdata(0,'uistack2undodata',[temp [p;children_handles]]);
+            setappdata(0,'uistack2undodata',[temp; [p;children_handles]]);
             
-        catch setappdata(0,'uistack2undodata',[p;children_handles]);
+        catch
+          
+            setappdata(0,'uistack2undodata',[p;children_handles]);
             
         end
         

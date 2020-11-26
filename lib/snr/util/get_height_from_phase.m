@@ -7,6 +7,8 @@ function [height, vertwavenum] = get_height_from_phase (phase, elev, wavelen, al
 % Output:
 %   height [meters]
 %   vertwavenum [degrees per meter]
+% See also: get_height_from_delay
+
   if (nargin < 4) || isempty(algorithm),  algorithm = 1;  end
   wavenum = 2*pi./wavelen;  % textbook definition of wavenumber.
   wavenum = wavenum * 180/pi;  % our convention is phase in degrees.

@@ -2,17 +2,17 @@ function [power, elev] = get_gps_power_min (freq_name, block_name, code_name, su
     [code_name, subcode_name] = get_gps_synonym (code_name, subcode_name, freq_name);
     all = get_gps_power_min_all ();
     
-    idx_freq    = ismembercc(all.freq_name,     freq_name);
-    idx_block   = ismembercc(all.block_name,    block_name);
-    idx_code    = ismembercc(all.code_name,     code_name);
-    idx_subcode = ismembercc(all.subcode_name,  subcode_name);    
+    idx_freq    = ismembercc(all.freq_name,    freq_name);
+    idx_block   = ismembercc(all.block_name,   block_name);
+    idx_code    = ismembercc(all.code_name,    code_name);
+    idx_subcode = ismembercc(all.subcode_name, subcode_name);    
     idx = idx_freq & idx_block & idx_code & idx_subcode;
     %myassert(sum(idx) == 1);
     %myassert(sum(idx) == 1);    
     if (sum(idx) ~= 1)
-        error('snr:get_gps_power_min:badComb', ['Unknown combination of '...
-            'frequency "%s", block "%s", code "%s", subcode "%s".'],...
-            freq_name, block_name, code_name, subcode_name, freq_name);
+        error('snr:get_gps_power_min:badComb', ...
+            'Unknown combination of frequency "%s", block "%s", code "%s", subcode "%s".',...
+            freq_name, block_name, code_name, subcode_name);
     end
     
     power_db = all.power_db(idx);    

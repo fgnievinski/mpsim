@@ -6,19 +6,20 @@ get_jacob, extra, ...
 time, obs, std, dof, dt, itime, ...
 ignore_self, robustify, detrendit, ...
 rigorous_residuals, interp_method, idof_method, ...
-conf, tail, multiple_correction)
+conf, tail, multiple_correction, std_inp_min)
 %SMOOTHITUP  Uncertainty-weighted running adjustment, returning confidence intervals.
 
-    if (nargin <  9),  itime = [];  end
-    if (nargin < 10),  ignore_self = [];  end
-    if (nargin < 11),  robustify = [];  end
-    if (nargin < 12),  detrendit = [];  end
-    if (nargin < 13),  rigorous_residuals = [];  end
-    if (nargin < 14),  interp_method = [];  end
-    if (nargin < 15),  idof_method = [];  end
-    if (nargin < 16),  conf = [];  end
-    if (nargin < 17),  tail = [];  end
-    if (nargin < 18),  multiple_correction = [];  end
+    if (nargin < 08),  itime = [];  end
+    if (nargin < 09),  ignore_self = [];  end
+    if (nargin < 10),  robustify = [];  end
+    if (nargin < 11),  detrendit = [];  end
+    if (nargin < 12),  rigorous_residuals = [];  end
+    if (nargin < 13),  interp_method = [];  end
+    if (nargin < 14),  idof_method = [];  end
+    if (nargin < 15),  conf = [];  end
+    if (nargin < 16),  tail = [];  end
+    if (nargin < 17),  multiple_correction = [];  end
+    if (nargin < 18),  std_inp_min = [];  end
 
     [iparam, icov_param, effect, ...
      iavg, itime, istd_obs, istd_avg, idof, istd, istd_scale, ...
@@ -26,12 +27,12 @@ conf, tail, multiple_correction)
       = smoothitup (get_jacob, extra, ...
         time, obs, std, dof, dt, itime, ...
         ignore_self, robustify, detrendit, ...
-        rigorous_residuals, interp_method, idof_method);
+        rigorous_residuals, interp_method, idof_method, std_inp_min);
       
-     conf_obs = get_pred_lim ( avg,  std_obs, dof2, conf, tail, 'direct', 'direct', multiple_correction);
-    iconf_obs = get_pred_lim (iavg, istd_obs, idof, conf, tail, 'direct', 'direct', multiple_correction, numel(avg));
-     conf_avg = get_pred_lim ( avg,  std_avg, dof2, conf, tail, 'direct', 'direct', 'none');
-    iconf_avg = get_pred_lim (iavg, istd_avg, idof, conf, tail, 'direct', 'direct', 'none');
+     conf_obs = get_confpred_lim ( avg,  std_obs, dof2, conf, tail, 'direct', 'direct', multiple_correction);
+    iconf_obs = get_confpred_lim (iavg, istd_obs, idof, conf, tail, 'direct', 'direct', multiple_correction, numel(avg));
+     conf_avg = get_confpred_lim ( avg,  std_avg, dof2, conf, tail, 'direct', 'direct', 'none');
+    iconf_avg = get_confpred_lim (iavg, istd_avg, idof, conf, tail, 'direct', 'direct', 'none');
     
     %TODO: offer option to return tolerance interval instead
     % [hint: matlab fileexchange (sheffe's formulation)]

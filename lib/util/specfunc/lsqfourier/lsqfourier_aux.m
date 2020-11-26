@@ -1,5 +1,5 @@
-function [param, fit, J_original, period, degree, opt] = lsqfourier_aux (obs, time, ...
-period, degree, opt, J_original)    
+function [param, fit, J_original, period, degree, opt, input_iscolvec] = lsqfourier_aux (obs, time, ...
+period, degree, opt, J_original)
 %LSQFOURIER_AUX: Auxiliary function for LSSA.
 
     %% parse input:
@@ -10,7 +10,7 @@ period, degree, opt, J_original)
     if isempty(degree),  degree = 0;  end    
     if islogical(degree)  % legacy interface.
         demean = degree;
-        if demean,  degree = 0;  else  degree = NaN;  end
+        if demean,  degree = 0;  else,  degree = NaN;  end
     end
     if isempty(opt),  opt = struct();  end
     if ischar(opt),  opt = {opt};  end  % legacy interface
@@ -18,21 +18,34 @@ period, degree, opt, J_original)
         opt(end+1:3) = {[]};
         opt = cell2struct(opt, {'method','tol','max_num_components'}, 2);
     end
+    assert(isstruct(opt))
     if isfieldempty(opt, 'method'),  opt.method = 'independent';  end
     if isfieldempty(opt, 'tol'),  opt.tol = 1/100;  end
     if isfieldempty(opt, 'max_num_components'),  opt.max_num_components = Inf;  end    
-    if iscell(obs),  [obs, std] = deal(obs{:});  else  std = [];  end
+    if isfieldempty(opt, 'check_jacob'),  opt.check_jacob = true;  end    
+    if iscell(obs),  [obs, std] = deal(obs{:});  else,  std = [];  end
     if ~isreal(obs)
         error('matlab:lsqfourier:nonReal', 'Complex-valued data not supported.');
     end    
 
-    %% discard invalid observations:
+    %% make input column vectors:
     assert(isvector(time))
     assert(isvector(obs))
+    if ~isempty(std),  assert(isvector(std));  end    
+    assert(isequal(size(time), size(obs)))
+    if ~isempty(std),  assert(isequal(size(time), size(std)));  end
+    input_iscolvec = iscolvec(time);
     time = time(:);
     obs  = obs(:);
+    std  = std(:);
+    
+    %% discard invalid observations:    
     idx_isnan = isnan(obs) | isnan(time);
-    time_original = time;  time(idx_isnan) = [];  obs(idx_isnan) = [];
+    if ~isempty(std),  idx_isnan = idx_isnan | isnan(std);  end
+    time_complete = time;
+    time(idx_isnan) = [];
+    obs(idx_isnan) = [];    
+    if ~isempty(std),  std(idx_isnan) = [];  end
 
     %% define periods of trial tones:
     period = lsqfourier_period (period, time);
@@ -52,7 +65,7 @@ period, degree, opt, J_original)
     clear num_components2 period2
     
     %% evaluate Jacobian:
-    J_original = lsqfourier_jacob (time_original, period, J_original, std);
+    J_original = lsqfourier_jacob (time_complete, period, J_original, std, opt.check_jacob);
     J = J_original;  % keep J_original unmodified because it is reused.
     if any(idx_isnan),  J(idx_isnan,:) = [];  end
 
@@ -86,6 +99,7 @@ period, degree, opt, J_original)
         param(idx) = param2;
         fit = fit2;
     %TODO: case {'polished', 'iterated refined'}  % hint: see lsqfourier_refine
+    %TODO: case {'polished complete', 'iterated refined complete'}  % hint: see lsqfourier_refine
     otherwise
         error('matlab:lsqfourier:unkMethod', 'Unknown method "%s".', opt.method);
     end
@@ -93,7 +107,7 @@ period, degree, opt, J_original)
     %% restore invalid observations:
     if any(idx_isnan)
         fit_old = fit;
-        fit = NaN(numel(time_original), size(fit_old,2));
+        fit = NaN(numel(time_complete), size(fit_old,2));
         fit(~idx_isnan,:) = fit_old;
     end
     
@@ -187,55 +201,6 @@ degree, opt, J) %#ok<INUSL>
 end
 
 %%
-function J = lsqfourier_jacob (time, period, J, std)
-    if (nargin < 3),  J = [];  end
-    if (nargin < 4),  std = [];  end
-    
-    %time_mat = repmat(time, [min(1,num_obs), num_components]);
-    %period_mat = repmat(period', [num_obs, min(1,num_components)]);
-    %arg = time_mat ./ period_mat;
-    if isempty(J)
-        arg = bsxfun(@rdivide, time, period');
-        J = exp(1i*2*pi*arg);
-        clear arg
-        if isempty(std),  return;  end
-        assert(numel(std) == numel(time))
-        J = bsxfun(@rdivide, J, std);  % = diag(1./std)*J;
-        return
-    end
-    
-    num_epochs = numel(time);
-    num_tones = numel(period);
-    siz = [num_epochs num_tones];
-    siz2 = size(J);
-    if ~isequal(siz2, siz)
-        warning('MATLAB:lsqfourier:badJSize', ...
-            'J matrix of wrong size (should be %dx%d, is %dx%d); ignoring it.', ...
-            siz(1), siz(2), siz2(1), siz2(2));
-        J = lsqfourier_jacob (time, period, [], std);
-        return;
-    end
-
-    % check at least first, middle, and last elements:
-    ind_time = [1; num_epochs; round(num_epochs/2)];
-    ind_period = [1; num_tones; round(num_tones/2)];
-    if isempty(std),  ind_std = [];  else  ind_std = ind_time;  end
-    J0 = diag(lsqfourier_jacob (time(ind_time), period(ind_period), ...
-      [], std(ind_std)));
-    %J0 = arrayfun(@(T,P) lsqfourier_jacob(T, P, [], std(ind_std)), ...
-    %  time_original(ind_time), period(ind_period));
-    ind_J = sub2ind(siz, ind_time, ind_period);
-    J0b = J(ind_J);
-    e0 = J0b(:) - J0(:);
-    if any(abs(e0) > eps())
-        %e11  % DEBUG
-        warning('MATLAB:lsqfourier:badJContent', ...
-            'J matrix has wrong content; ignoring it.');
-        J = lsqfourier_jacob (time, period, [], std);
-    end
-end
-
-%%
 %!test
 %! % single frequency:
 %! n = 10;
@@ -244,7 +209,7 @@ end
 %! magn = rand;
 %! phase = rand*360;
 %! y = magn * exp(1i*phase*pi/180);
-%! get_phase2 = @(x) azimuth_range_positive(get_phase(x));
+%! get_phase2 = @(x) angle_range_positive(get_phase(x));
 %! 
 %! x = magn * cos(2*pi * freq * t + phase*pi/180);
 %! y2xa = @(y) abs(y) * cos(2*pi * freq * t + get_phase(y)*pi/180);

@@ -4,8 +4,8 @@ function [wmean, n, std2, std3, std4] = nanmeanur (obs, std, dim, ignore_nans, d
 % wmean: weighted mean
 % n: number of observations (excluding NaNs)
 % std2: formal standard uncertainty of the mean (unscaled)
-% std3: square-root of reduced chi-squared
-% std4: typical input or a priori standard uncertainty of observations
+% std3: square-root of reduced chi-squared statistic or a-posteriori variance factor
+% std4: typical input or a-priori standard uncertainty of observations
 
     if (nargin < 2),  std = [];  end
     if (nargin < 3),  dim = [];  end

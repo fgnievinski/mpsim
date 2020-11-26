@@ -10,16 +10,18 @@ function [prob, conf, tail] = get_prob (conf, tail)
     end
 
     switch tail
-    case {'both','max'},   prob = [(1-conf)/2, 1-(1-conf)/2];
-    case 'right',  prob = 1 - conf;
     case 'left',   prob = conf;
+    case 'right',  prob = 1 - conf;
+    case 'both',   prob = [(1-conf)/2, 1-(1-conf)/2];
+    case 'two',    prob = 1-(1-conf)/2;
+    case 'max',    prob = 1-(1-conf)/2;
     % (definition below is inconsistent w/ stats vartest*)
     %case 'left',   prob = 1 - conf;
     %case 'right',  prob = conf;
     otherwise
         error('stats:internal:getParamVal:BadValueListChoices', ...
             ['''%s'' is not a valid value for the TAIL argument.  '...
-             'The value must be ''left'', ''both'', or ''right''.'], tail);
+             'The value must be ''left'', ''right'', ''both'', or ''''.'], tail);
     end
     %prob  % DEBUG
 end

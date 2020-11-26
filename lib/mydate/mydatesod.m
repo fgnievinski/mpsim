@@ -1,4 +1,4 @@
-function sod = mydatesod (epoch, epoch0)
+function [sod, num0] = mydatesod (epoch, epoch0)
 %MYDATESOD: Return (decimal) seconds of day (optionally, elapsed since beginning of a different day).
     if (nargin < 2),  epoch0 = [];  end
     if isempty(epoch)

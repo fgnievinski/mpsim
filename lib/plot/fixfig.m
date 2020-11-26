@@ -99,6 +99,7 @@ if verLessThan('matlab','R2014b')
     a=get(fignum,'Children')';
 else
     ax = findobj(fignum,'Type','axes');
+    if isempty(ax),  ax = axes();  end
     % this is an ugly hack, but it works with the existing code
     for k = 1:length(ax)
         a(k) = ax(k);                                                       %#ok<AGROW>

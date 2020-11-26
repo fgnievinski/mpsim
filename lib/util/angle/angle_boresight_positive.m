@@ -1,4 +1,6 @@
 function [angp, azim] = angle_boresight_positive (ang, azi)
+    % convert boresight angle domain, from +/-180 to 0-180, modifying azimuth if necessary.
+    
     %whos ang azi  % DEBUG    
     assert(all(abs(ang) <= 360));
     m = numel(ang);

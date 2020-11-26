@@ -14,6 +14,10 @@ function [height_compos, phase_compos, vertwavenum] = get_height_compositional (
       phase_compos = result.phase_compos;
       elev = result.sat.elev;
       wavelen = setup.opt.wavelength;
+  case 1
+      error('MATLAB:maxrhs', 'Not enough input arguments.');
+  otherwise
+      error('MATLAB:maxrhs', 'Too many input arguments.');
   end
   
   [height_compos, vertwavenum] = get_height_from_phase (phase_compos, elev, wavelen);

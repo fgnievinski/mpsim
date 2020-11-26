@@ -29,6 +29,7 @@ end
 %%
 function [ym, ws, n] = nanmedianwvec (y, w, ignore_nans)
   if ignore_nans,  idx = isnan(y) | isnan(w);  y(idx) = [];  w(idx) = [];  end
+  idx = (w==0);  y(idx) = [];  w(idx) = [];  % ignore zero-weight obs.  
   n = numel(y);
   %ws = sum(w, dim);  wm = ws ./ n;
   wm = median(w);  ws = wm .* n;
@@ -43,6 +44,7 @@ end
 %%
 function ym = nanmedianwvecaux (y, w, ws, n)
   nw = w ./ ws;
+  nw(ws==0) = Inf;
   [y, indo] = sort(y);
   nw = nw(indo);
   cw = cumsum(nw);

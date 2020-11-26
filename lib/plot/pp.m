@@ -456,7 +456,8 @@ CreateNewFigure = 1;
 %Default HoldWasOn flag is 0 (ie hold was not on)
 HoldWasOn = 0;
 
-if max(findobj) ~= 0
+%if max(findobj) ~= 0
+if isempty(findobj)
     %if hold is on then set the HoldWasOn flag so it can be turned on after all plotting complete
 
     if ishold
@@ -1372,7 +1373,8 @@ end
 
 if ~isnumeric(oc.centre_value)
     if strcmp(lower(oc.centre_value), 'min')
-        TraceMin = '';
+        %TraceMin = '';
+        TraceMin = [];
         for i = 1:2:length(Traces)
             TraceMin = [TraceMin min(Traces{i}(:,1))];
         end

@@ -1,5 +1,8 @@
 function [unc, cov, rms] = mplsqfourier_uncertainty_aux (...
 resid, jacob, colname, wavelength, rms_method)
+
+%TODO: refactor using lsqfourier_uncertainty_aux.m
+
     if (nargin < 4),  wavelength = [];  end
     if (nargin < 5) || isempty(rms_method),  rms_method = 'robust';  end
     

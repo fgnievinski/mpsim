@@ -35,7 +35,11 @@ function phase_compos = get_phase_compositional_aux (result, unwrapit)
   %phase_geom   = unwrapd(get_phase(result.reflected.phasor_delay));
   %phase_compos = phase_interf - phase_geom;
   % more reliable:
-  phase_compos = get_phase(result.phasor_interf./result.reflected.phasor_delay);
+  if isfield(result.reflected, 'phasor_nongeom')
+    phase_compos = get_phase(result.reflected.phasor_nongeom);
+  else
+    phase_compos = get_phase(result.phasor_interf./result.reflected.phasor_delay);
+  end
   if ~unwrapit,  return;  end
   phase_compos = unwrapd(phase_compos);
 end

@@ -1,4 +1,4 @@
-function answer = plus (left, right)
+function answer = eq (left, right)
     error(check_op (left, right, 'eq', 'packed:eq'));
     answer = do_op (left, right, 'eq');
 end

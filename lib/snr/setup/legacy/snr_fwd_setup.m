@@ -1,3 +1,5 @@
+% (this is a legacy interface, kept for backwards compatibility;
+%  we recommend using instead the modern version: snr_setup.)
 function varargout = snr_fwd_setup (sett, ant)
     if (nargin < 2),  ant = [];  end
     if ~isempty(ant)
