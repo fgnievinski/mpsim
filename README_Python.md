@@ -21,7 +21,7 @@ The installation will compile necessary mex files, and copies the matlab code to
 Syntax is similar to the Matlab/Octave code, but with Python syntax. For example:
 
 ```
-from pympsim.snr import snr_settings,snr_setup,snr_fwd
+from pympsim.oct import snr_settings,snr_setup,snr_fwd
 settings=snr_settings()
 
 # possibly manipulate some settings

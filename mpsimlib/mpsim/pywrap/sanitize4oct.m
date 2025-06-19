@@ -9,8 +9,8 @@ for [val,key] = istruct
       % retrieve the function from the global lookup
       fnc=getfield(mpsimflookup,val);
     else
-       
-      error("Function not found in global lookup table.",key);
+      %just create a pointer to the function (should be findable in the Octave path)
+      fnc=str2func(val(2:));       
     end
     strc=setfield(strc,key,fnc);
   end
