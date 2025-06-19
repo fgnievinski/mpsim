@@ -21,4 +21,4 @@ def setErrorLevel():
     log.setLevel(logging.ERROR)
 
 
-setInfoLevel()
+setErrorLevel()

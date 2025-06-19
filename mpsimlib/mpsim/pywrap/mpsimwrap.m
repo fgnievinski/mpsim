@@ -1,11 +1,31 @@
 function outstrc = mpsimwrap(mpsimfunc, varargin)
 
-if length(varargin) == 1 && iscell(varargin{1})
-    % If the first argument is a cell array, unpack it
-    outstrc = sanitize4py(feval(mpsimfunc, sanitize4oct(varargin{1})));
-elseif length(varargin) > 1
-    % If there are multiple arguments, unpack them
-    error("cannot currently wrap functions with multiple input arguments");
+nout=nargout(mpsimfunc);
+
+if nargin == 1
+    %no additional arguments provided
+    if nout == 0
+        outstrc = feval(mpsimfunc);
+    else
+
+        outstrc=sanitize4py(feval(mpsimfunc));
+    endif
 else
-    outstrc=sanitize4py(feval(mpsimfunc));
+
+    % possibly sanitize (variable) input arguments 
+    for i = 1:length(varargin)
+        if isstruct(varargin{i})
+            varargin{i} = sanitize4oct(varargin{i});
+        end
+    end
+    if nout == 0
+        feval(mpsimfunc, varargin{:});
+    else
+        outstrc = sanitize4py(feval(mpsimfunc, varargin{:}));
+    endif
 endif
+
+
+
+
+endfunction
