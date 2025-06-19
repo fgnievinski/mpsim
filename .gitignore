@@ -1,0 +1,8 @@
+# local pip environment for development purposes
+pymp
+__pycache__
+*egg-info
+octave-workspace
+build
+.ipynb_checkpoints
+src/pympsim/_version.py

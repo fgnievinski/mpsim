@@ -1,0 +1,49 @@
+# pyproject.toml  
+# This file is part of mpsim
+#license: SEE LICENSE file
+# Author Roelof Rietbroek (r.rietbroek@utwente.nl), 2025
+
+[build-system]
+requires = ["setuptools>=61.0","setuptools-scm>=8","wheel"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "pympsim"
+dynamic = ["version"]
+authors = [
+  {name="Felipe Geremia Nievinksi"},{name="Roelof Rietbroek", email="r.rietbroek@utwente.nl"},
+]
+description="Python module wrapping around the mpsim matlab/octave GNSS simulator"
+readme = "README_Python.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Development Status :: 4 - Beta"
+]
+
+dependencies = ['oct2py']
+
+[project.optional-dependencies]
+
+[project.urls]
+"Homepage" = "https://github.com/fgnievinski/mpsim"
+"Bug Tracker" = "https://github.com/fgnievinski/mpsim/issues"
+
+[tool.setuptools.packages.find]
+where = ["src","mpsimlib"]  # list of folders that contain the packages (["."] by default)
+#include = ["pympsim*","mpsimlib"]  # package names should match these glob patterns (["*"] by default)
+
+# include all subpackages in the installation
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools_scm]
+version_file = "src/pympsim/_version.py"
+
+
+
+
+
+
